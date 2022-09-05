@@ -1,22 +1,20 @@
 import arc
 
 class Node:
-    def __init__(self, x, y, node_typ, id):
-        self.position = [x, y]
+    def __init__(self, position, node_typ, id):
+        self.position = position
         self.type = node_typ
         self.id = id
     
 class EvaArea(Node):        # a
-    def __init__(self):
-        self.type = "area"
-        self.evaDemand = 0
-        self.numSelfEva = 0
+    type = "area"
+    evaDemand = 0
+    numSelfEva = 0
 
 class PickDropPoint(Node):    # b
-    def __init__(self):
-        self.type = "pick_up"
-        self.trip = 0
-        self.assignedResource = 0
+    type = "pick_up"
+    trip = 0
+    assignedResource = 0
 
 
 # class ResInitialLocation(Node):
