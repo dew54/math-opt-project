@@ -3,6 +3,7 @@ import arc
 class Node:
     def __init__(self, position, node_typ, id):
         self.position = position
+        #print("nodePos is: ", position)
         self.type = node_typ
         self.id = id
     

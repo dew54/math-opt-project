@@ -1,4 +1,6 @@
 import random
+import os
+import toml
 from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *
@@ -45,9 +47,9 @@ def generateData(num_i, num_a, num_h, num_b, num_c):
 
 
     
-    alfa = []
+    alfa = []                                                                   # from source s to area a
     for area in areas:
-        arc =  selfEvaArc(source, area, -1)
+        arc =  selfEvaArc(source, area, 0)
         alfa.append(arc)
 
 
@@ -58,11 +60,11 @@ def generateData(num_i, num_a, num_h, num_b, num_c):
             resource.trip = k
             resource.speed = 40
             arcsA_B = []
-            for a_i in range(1, num_a):
+            for a_i in range(0, num_a):
                 startNode = areas[a_i-1]
-                for b_i in range(1, num_b):
+                for b_i in range(0, num_b):
                     endNode = pickUpPoints[b_i-1]
-                    arc = Arc(startNode, endNode, resource, resource.capacity)
+                    arc = Arc(startNode, endNode, resource)
                     arcsA_B.append(arc)
             beta_k.append(arcsA_B)
         beta.append(beta_k)
@@ -75,11 +77,11 @@ def generateData(num_i, num_a, num_h, num_b, num_c):
             resource.trip = k
             resource.speed = 25
             arcsB_C = []
-            for b_i in range(1, num_b):
+            for b_i in range(0, num_b):
                 startNode = pickUpPoints[b_i-1]
-                for c_i in range(1, num_c):
+                for c_i in range(0, num_c):
                     endNode = shelters[c_i-1]
-                    arc = Arc(startNode, endNode, resource, resource.capacity)
+                    arc = Arc(startNode, endNode, resource)
                     arcsB_C.append(arc)
             gamma_k.append(arcsB_C)
         gamma.append(gamma_k)
@@ -89,35 +91,43 @@ def generateData(num_i, num_a, num_h, num_b, num_c):
     for resource in resources:
         delta_k = []
         for k in range(1, resource.maxTrips - 1):
+            resource.trip = k
+            resource.speed = 40
             arcsC_B = []
-            for c_i in range(1, num_c):
+            for c_i in range(0, num_c):
                 startNode = shelters[c_i-1]
-                for b_i in range(1, num_b):
+                for b_i in range(0, num_b):
                     endNode = pickUpPoints[b_i-1]
-                    arc = Arc(startNode, endNode, resource, 0)
+                    arc = Arc(startNode, endNode, 0)
                     arcsC_B.append(arc)
             delta_k.append(arcsB_C)
         delta.append(delta_k)
 
     
-    epsilon = []                                                                # Drop-off 𝑐 to sink node i
-    for resource in resources:
-        for c_i in range(1, num_c):
-            startNode = shelters[c_i-1]
-            arc = Arc(startNode, sink, resource, -1)
-            epsilon.append(arc)
+    epsilon = []                                                                # Drop-off 𝑐 to sink node t
+    for shelter in shelters:
+        startNode = shelter
+        arc = Arc(startNode, sink, 0)
+        epsilon.append(arc)
                 
     
     psi = []                                                                    # Initial resource location ℎ to pick-up b
     for resource in resources:
         arcsH_B = []        
-        for h_i in range(1, num_h):
+        for h_i in range(0, num_h):
             startNode = initialLocations[h_i-1]
-            for b_i in range(1, num_b):
+            for b_i in range(0, num_b):
                 endNode = pickUpPoints[b_i-1]
-                arc = Arc(startNode, endNode, resource, 0)
+                arc = Arc(startNode, endNode, 0)
                 arcsH_B.append(arc)
         psi.append(arcsH_B)
+
+    lmbda = []                                                                  # from area a to sink t
+    for area in areas:
+        startNode = area
+        arc = Arc(startNode, sink, 5)
+        lmbda.append(arc)
+
 
 
 
@@ -137,8 +147,10 @@ def generateData(num_i, num_a, num_h, num_b, num_c):
     data['arcs']['delta'] = delta
     data['arcs']['epsilon'] = epsilon
     data['arcs']['psi'] = psi
+    data['arcs']['lmbda'] = lmbda
 
-
+    with open(os.path.join(os.path.dirname(__file__),'config.toml'),'w') as f:
+        toml.dump(data, f)
 
 
     return data
@@ -153,4 +165,4 @@ def generateGridMap(num_i, num_a, num_h, num_b, num_c):
 
 
 if __name__ == "__main__":
-    print (generateData(3, 2, 2, 2, 2, 2))
+    generateData(3, 2, 2, 2, 2)
