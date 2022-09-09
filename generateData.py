@@ -5,19 +5,19 @@ from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *
 
-def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand):
+def generateData(num_i, num_a, num_h, num_b, num_c, num_k, num_selfEva, evaDemand):
 
 
     resources = []
     for index in range(num_i):
-        resource = Resource(num_h)
+        resource = Resource(num_h, num_k)
         resources.append(resource)
 
-    sourcePosition = [random.randint(1, 10), random.randint(20, 80) ]
+    sourcePosition = [random.randint(1, 10), random.randint(49, 51) ]
     
     source = Node(sourcePosition,"source", 1)
 
-    sinkPosition = [random.randint(90, 99), random.randint(20, 80) ]
+    sinkPosition = [random.randint(90, 99), random.randint(49, 51) ]
 
     sink = Node(sinkPosition, "sink", 1)
 
@@ -166,6 +166,17 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand):
     data['arcs']['epsilon'] = epsilon
     data['arcs']['psi'] = psi
     data['arcs']['lmbda'] = lmbda
+    data['params'] = dict()
+    data['params']['i'] = num_i #num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
+    data['params']['a'] = num_a
+    data['params']['b'] = num_b
+    data['params']['h'] = num_h
+    data['params']['c'] = num_c
+    data['params']['k'] = num_k
+    data['params']['self'] = num_selfEva
+    data['params']['demand'] = evaDemand
+
+
 
     with open(os.path.join(os.path.dirname(__file__),'config.toml'),'w') as f:
         toml.dump(data, f)

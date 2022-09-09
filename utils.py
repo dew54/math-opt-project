@@ -1,4 +1,5 @@
 import math
+import re
 
 
 class Utils:
@@ -25,3 +26,12 @@ class Utils:
         print(x1, " : ", x2, " middle is: ", xm)
         print(y1, " : ", y2, " middle is: ", ym)
         return xm, ym
+    
+    def getKeys(name):
+        result = re.search('\[(.*)\]', name)
+        string = result.group(1).replace(',', '')
+        result = []
+        for i in range(len(string)):
+            result.append(string[i])
+        return result
+

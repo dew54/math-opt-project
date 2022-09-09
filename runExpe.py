@@ -10,18 +10,17 @@ from generateData import generateData
 from utils import Utils
 
 
-def runExpe():
-    num_i = 3
-    num_a = 2
-    num_b = 2
-    num_c = 2
-    num_h = 2
+def runExpe(data):
+    num_i = data['params']['i']#3
+    num_a = data['params']['a']
+    num_b = data['params']['b']
+    num_c = data['params']['c']
+    num_h = data['params']['h']
     num_t = 1
-    num_k = 5
-    num_selfEva = 3
-    evaDemand = 30
+    num_k = data['params']['k']
+    num_selfEva = data['params']['self'] 
+    evaDemand = data['params']['demand'] 
 
-    data = generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand)
 
 
     evaAreas = data["nodes"]["area"]
@@ -269,19 +268,24 @@ def runExpe():
 
     D_ICEP.optimize()  # equivalent to solve() for xpress
 
+
+
+  
+
     for v in X_i_k_bc.values():
         if v.X == 1:
 
-            print(v.VarName) 
+            print(Utils.getKeys(v.VarName)) 
             #print(v.)
 
 
 
     if D_ICEP.status == 2:
-        print( D_ICEP.status, D_ICEP.Runtime, D_ICEP.ObjVal)
-        #print("-----------------", X_i_k_bc.values(), "-----------------")
         D_ICEP.write("solution.sol")
         D_ICEP.write("mymodel.lp")
+        return D_ICEP.status, D_ICEP.Runtime, D_ICEP.ObjVal, D_ICEP
+        #print("-----------------", X_i_k_bc.values(), "-----------------")
+
     else:
         print("--------Gurobi did not find a optiml solution-----------")
         return D_ICEP.status, D_ICEP.Runtime, None
