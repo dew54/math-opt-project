@@ -5,11 +5,11 @@ from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *
 
-def generateData(num_i, num_a, num_h, num_b, num_c):
+def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand):
 
 
     resources = []
-    for index in range(1, num_i):
+    for index in range(num_i):
         resource = Resource(num_h)
         resources.append(resource)
 
@@ -22,25 +22,26 @@ def generateData(num_i, num_a, num_h, num_b, num_c):
     sink = Node(sinkPosition, "sink", 1)
 
     areas = []
-    for index in range(0, num_a):
+    for index in range(num_a):
         position = [random.randint(15, 30), random.randint(1, 99) ]
         area = EvaArea(position, "evaArea", index)
+        area.evaDemand = evaDemand
         areas.append(area)
     
     initialLocations = []
-    for index in range(0, num_h):
+    for index in range(num_h):
         position = [random.randint(10, 15), random.randint(1, 99) ]
         initialLocation = Node(position, "initial", index)
         initialLocations.append(initialLocation)
     
     pickUpPoints = []
-    for index in range(0, num_b):
+    for index in range(num_b):
         position = [random.randint(31, 60), random.randint(1, 99) ]
         pickUpPoint = PickDropPoint(position, "pick_up", index)
         pickUpPoints.append(pickUpPoint)
     
     shelters = []
-    for index in range(0, num_c):
+    for index in range(num_c):
         position = [random.randint(61, 85), random.randint(1, 99) ]
         shelter = PickDropPoint(position, "shelter", index)
         shelters.append(shelter)
@@ -49,83 +50,100 @@ def generateData(num_i, num_a, num_h, num_b, num_c):
     
     alfa = []                                                                   # from source s to area a
     for area in areas:
-        arc =  selfEvaArc(source, area, 0)
+        arc =  Arc(source, area, 0, "alfa")
         alfa.append(arc)
 
 
     beta = []                                                                   # Area 𝑎 to pick-up 𝑏 of trip 𝑘 for resource i
     for resource in resources:
         beta_k = []
-        for k in range(1, resource.maxTrips):
+        for k in range(resource.maxTrips):
             resource.trip = k
-            resource.speed = 40
-            arcsA_B = []
-            for a_i in range(0, num_a):
+            resource.speed = 0
+            arcs_A = []
+            for a_i in range(num_a):
+                arcsA_B = []
                 startNode = areas[a_i-1]
-                for b_i in range(0, num_b):
+                for b_i in range(num_b):
                     endNode = pickUpPoints[b_i-1]
-                    arc = Arc(startNode, endNode, resource)
+                    arc = Arc(startNode, endNode, 0, "beta")
+                    arc.trip = k
                     arcsA_B.append(arc)
-            beta_k.append(arcsA_B)
+                arcs_A.append(arcsA_B)
+            beta_k.append(arcs_A)
         beta.append(beta_k)
 
 
     gamma = []                                                                  # Pick-up 𝑏 to drop-off 𝑐 of trip 𝑘 for resource i
     for resource in resources:
         gamma_k = []
-        for k in range(1, resource.maxTrips):
+        for k in range(resource.maxTrips):
             resource.trip = k
             resource.speed = 25
-            arcsB_C = []
-            for b_i in range(0, num_b):
+            arcs_B = []
+            
+            for b_i in range(num_b):
+                arcsB_C = []
                 startNode = pickUpPoints[b_i-1]
-                for c_i in range(0, num_c):
+                for c_i in range(num_c):
                     endNode = shelters[c_i-1]
-                    arc = Arc(startNode, endNode, resource)
+                    arc = Arc(startNode, endNode, resource, "gamma")
+                    
                     arcsB_C.append(arc)
-            gamma_k.append(arcsB_C)
+                arcs_B.append(arcsB_C)
+            gamma_k.append(arcs_B)
         gamma.append(gamma_k)
 
     
     delta = []                                                                  # Drop-off 𝑐 to pick-up 𝑏 of trip 𝑘 to trip 𝑘 + 1 , For resource 𝑖, for 𝑘 = 1,… , 𝐾 − 1 
     for resource in resources:
         delta_k = []
-        for k in range(1, resource.maxTrips - 1):
+        for k in range(resource.maxTrips):
             resource.trip = k
             resource.speed = 40
-            arcsC_B = []
-            for c_i in range(0, num_c):
+            arcs_C = []
+            
+            for c_i in range(num_c):
+                arcsC_B = []
                 startNode = shelters[c_i-1]
-                for b_i in range(0, num_b):
+                for b_i in range(num_b):
                     endNode = pickUpPoints[b_i-1]
-                    arc = Arc(startNode, endNode, 0)
+                    arc = Arc(startNode, endNode, resource, "delta")
+                    arc.trip = k
                     arcsC_B.append(arc)
-            delta_k.append(arcsB_C)
+                arcs_C.append(arcsC_B)
+            delta_k.append(arcs_C)
         delta.append(delta_k)
 
     
     epsilon = []                                                                # Drop-off 𝑐 to sink node t
     for shelter in shelters:
         startNode = shelter
-        arc = Arc(startNode, sink, 0)
+        arc = Arc(startNode, sink, 0, "epsilon")
+        arc.trip = k
         epsilon.append(arc)
                 
     
     psi = []                                                                    # Initial resource location ℎ to pick-up b
     for resource in resources:
-        arcsH_B = []        
-        for h_i in range(0, num_h):
+        arcs_H = []
+        for h_i in range(num_h):
+            arcsH_B = []
             startNode = initialLocations[h_i-1]
-            for b_i in range(0, num_b):
+            for b_i in range(num_b):
                 endNode = pickUpPoints[b_i-1]
-                arc = Arc(startNode, endNode, 0)
+                arc = Arc(startNode, endNode, resource, "psi")
                 arcsH_B.append(arc)
-        psi.append(arcsH_B)
+            arcs_H.append(arcsH_B)
+        psi.append(arcs_H)
 
     lmbda = []                                                                  # from area a to sink t
     for area in areas:
+        
+        area.selfEva = num_selfEva
         startNode = area
-        arc = Arc(startNode, sink, 5)
+        arc = Arc(startNode, sink, 0, "lmbda")
+        arc.trip = k
         lmbda.append(arc)
 
 

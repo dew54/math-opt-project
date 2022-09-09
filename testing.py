@@ -2,4 +2,5 @@
 import random
 if __name__ == "__main__":
 
-    print(random.randint(15, 30))
+    for i in range(1):
+        print(i)
