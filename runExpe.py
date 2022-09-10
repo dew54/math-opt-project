@@ -1,6 +1,8 @@
 from unicodedata import name
 from matplotlib import pyplot as plt
 from matplotlib import collections  as mc
+from contextlib import suppress
+
 
 from resource import Resource
 from node import *#Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
@@ -40,106 +42,111 @@ def runExpe(data):
 
 
     # ================ Plotting ================
-    plt.xlim(0, 100)
-    plt.ylim(0, 100)
-    plt.grid()
+    # plt.xlim(0, 100)
+    # plt.ylim(0, 100)
+    # plt.grid()
 
-    #plot source 
-    sourcePosition = data["nodes"]["source"].position
+    # #plot source 
+    # sourcePosition = data["nodes"]["source"].position
 
-    plt.plot(sourcePosition[0], sourcePosition[1], marker="+", markersize=10, markeredgecolor="red", markerfacecolor="green")
-    # plot evaArea
-
-    
-
-
-
-    for area in evaAreas:
-        position = area.position
-        #print(position)
-        plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="blue")
+    # plt.plot(sourcePosition[0], sourcePosition[1], marker="+", markersize=10, markeredgecolor="red", markerfacecolor="green")
+    # # plot evaArea
 
     
-    for loc in initialLocations:
-        position = loc.position
-        plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="yellow", markerfacecolor="grey")
-    
-    
-    for pickUpPoint in pickUpPoints:
-        position = pickUpPoint.position
-        #print(position)
-        plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="yellow")
+
+
+
+    # for area in evaAreas:
+    #     position = area.position
+    #     #print(position)
+    #     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="blue")
 
     
-    for shelter in shelters:
-        position = shelter.position
-        #print(position)
-        plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="red")
+    # for loc in initialLocations:
+    #     position = loc.position
+    #     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="yellow", markerfacecolor="grey")
+    
+    
+    # for pickUpPoint in pickUpPoints:
+    #     position = pickUpPoint.position
+    #     #print(position)
+    #     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="yellow")
 
     
-    position = sink.position
-    plt.plot(position[0], position[1], marker="+", markersize=10, markeredgecolor="green", markerfacecolor="red")
+    # for shelter in shelters:
+    #     position = shelter.position
+    #     #print(position)
+    #     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="red")
 
-    ### ARCS alfa ####
-    for a in alfa:
-        pStart = a.startNode.position
-        pEnd = a.endNode.position
+    
+    # position = sink.position
+    # plt.plot(position[0], position[1], marker="+", markersize=10, markeredgecolor="green", markerfacecolor="red")
+
+    # ### ARCS alfa ####
+    # for a in alfa:
+    #     pStart = a.startNode.position
+    #     pEnd = a.endNode.position
 
 
-        x1, y1 = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+    #     x1, y1 = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
 
-        plt.plot(x1, y1, 'r:')
+    #     plt.plot(x1, y1, 'r:')
 
-    ### ARCS beta ####
-    for a in range(num_a):    
-        for b in beta[0][0][a]:
-            pStart = b.startNode.position
-            pEnd = b.endNode.position
-            x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+    # ### ARCS beta ####
+    # for a in range(num_a):    
+    #     for b in beta[0][0][a]:
+    #         pStart = b.startNode.position
+    #         pEnd = b.endNode.position
+    #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
             
-            plt.plot(x, y, 'b')
-            xm, ym = Utils.middle(pStart, pEnd)
-            plt.text(xm, ym, str(b.cost), color="blue")
-    for b in range(num_b):
-        for g in gamma[0][0][b]:
-            pStart = g.startNode.position
-            pEnd = g.endNode.position
-            x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-            plt.plot(x, y, 'g')
-            xm, ym = Utils.middle(pStart, pEnd)
-            plt.text(xm -1 , ym, str(int(g.cost)))
-    for c in range(num_c):
-        for a in delta[0][0][c]:
-            pStart = a.startNode.position
-            pEnd = a.endNode.position
-            x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-            plt.plot(x, y, 'm--')
-            xm, ym = Utils.middle(pStart, pEnd)
-            plt.text(xm + 1, ym, str(int(a.cost)))
-    for a in epsilon:
-        pStart = a.startNode.position
-        pEnd = a.endNode.position
-        x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-        plt.plot(x, y, 'k:')
-        # xm, ym = Utils.middle(pStart, pEnd)
-        # plt.text(xm, ym, str(a.cost))
-    for h in range(num_h):
-        for a in psi[0][h]:
-            pStart = a.startNode.position
-            pEnd = a.endNode.position
-            x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-            plt.plot(x, y, 'c--')
-            xm, ym = Utils.middle(pStart, pEnd)
-            plt.text(xm, ym, str(a.cost), color="cyan")
-    for a in lmbda:
-        pStart = a.startNode.position
-        pEnd = a.endNode.position
-        print(a.flow)
+    #         plt.plot(x, y, 'b')
+    #         xm, ym = Utils.middle(pStart, pEnd)
+    #         plt.text(xm, ym, str(b.cost), color="blue")
 
-        x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-        plt.plot(x, y, 'y')
-        xm, ym = Utils.middle(pStart, pEnd)
-        plt.text(xm, ym, str(a.cost))
+    # for b in range(num_b):
+    #     for g in gamma[0][0][b]:
+    #         pStart = g.startNode.position
+    #         pEnd = g.endNode.position
+    #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+    #         plt.plot(x, y, 'g')
+    #         xm, ym = Utils.middle(pStart, pEnd)
+    #         plt.text(xm -1 , ym, str(int(g.cost)))
+
+    # for c in range(num_c):
+    #     for a in delta[0][0][c]:
+    #         pStart = a.startNode.position
+    #         pEnd = a.endNode.position
+    #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+    #         plt.plot(x, y, 'm--')
+    #         xm, ym = Utils.middle(pStart, pEnd)
+    #         plt.text(xm + 1, ym, str(int(a.cost)))
+
+    # for a in epsilon:
+    #     pStart = a.startNode.position
+    #     pEnd = a.endNode.position
+    #     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+    #     plt.plot(x, y, 'k:')
+    #     # xm, ym = Utils.middle(pStart, pEnd)
+    #     # plt.text(xm, ym, str(a.cost))
+
+    # for h in range(num_h):
+    #     for a in psi[0][h]:
+    #         pStart = a.startNode.position
+    #         pEnd = a.endNode.position
+    #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+    #         plt.plot(x, y, 'c--')
+    #         xm, ym = Utils.middle(pStart, pEnd)
+    #         plt.text(xm, ym, str(a.cost), color="cyan")
+
+    # for a in lmbda:
+    #     pStart = a.startNode.position
+    #     pEnd = a.endNode.position
+    #     print(a.flow)
+
+    #     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+    #     plt.plot(x, y, 'y')
+    #     xm, ym = Utils.middle(pStart, pEnd)
+    #     plt.text(xm, ym, str(a.cost))
 
 
    
@@ -168,12 +175,12 @@ def runExpe(data):
     r = D_ICEP.addVar(vtype=gb.GRB.INTEGER, name="totalTime")
     #print(gamma[0][0][0])
 
-    plt.show()
+    #plt.show()
     #plt.pause(0.001)
     # return
 
-# ## COnstraints
-
+    # ## COnstraints
+    #with suppress(Exception):   
 
     # Eq. 2
     D_ICEP.addConstrs((S_i[i]<=r for i in range(num_i)), name="Eq-2")
@@ -182,11 +189,11 @@ def runExpe(data):
     # for i in range(num_i-1): 
         
     # Eq. 3
-    D_ICEP.addConstrs(((gb.quicksum( psi[i][h][b].cost * W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b) ) 
+    D_ICEP.addConstrs(((gb.quicksum( psi[i, h, b].cost * W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b) ) 
         + 
-            gb.quicksum(gamma[i][k][b][c].cost * X_i_k_bc[i, k, b, c] for k in range(num_k) for b in range(num_b) for c in range(num_c))
+            gb.quicksum(gamma[i, k, b, c].cost * X_i_k_bc[i, k, b, c] for k in range(num_k) for b in range(num_b) for c in range(num_c))
         +
-            gb.quicksum(delta[i][k][c][b].cost * Y_i_k_cb[i, k, c, b] for k in range(num_k) for c in range(num_c) for b in range(num_b))
+            gb.quicksum(delta[i, k, c, b].cost * Y_i_k_cb[i, k, c, b] for k in range(num_k) for c in range(num_c) for b in range(num_b))
         +
             gb.quicksum(resources[i].timeToAvaiability * W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b)) 
         +
@@ -270,12 +277,7 @@ def runExpe(data):
 
 
 
-  
-
-    for v in X_i_k_bc.values():
-        if v.X == 1:
-
-            print(Utils.getKeys(v.VarName)) 
+  #
             #print(v.)
 
 

@@ -12,14 +12,17 @@ class Arc:
         self.flow = int()
         
         if(typ == "gamma"):
+            self.resource = resource
             self.cost = self.length/resource.loadedSpeed
             self.flow = resource.capacity/self.cost
             self.trip = resource.trip #SERVE???
         elif(typ == "delta"):
+            self.resource = resource
             self.cost = self.length/resource.emptySpeed
             self.flow = resource.capacity/self.cost
             self.trip = resource.trip #SERVE???
         elif(typ == "psi"):
+            self.resource = resource
             self.cost = self.length/resource.emptySpeed
             self.flow = 0
             self.trip = 0
@@ -63,9 +66,13 @@ class Arc:
         # print("arc end is: ", p2)
        
         return Utils().distance(p1, p2)
-
     
-
+    def isLegit(self):
+        if self.resource.clas != self.startNode.clas or self.resource.clas !=self.endNode.clas:
+            return False
+        else:
+            return True
+            
 
     
 class selfEvaArc(Arc):

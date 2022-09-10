@@ -1,18 +1,27 @@
+import math
 import random
 import os
 import toml
+import pandas as pd
 from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *
 
-def generateData(num_i, num_a, num_h, num_b, num_c, num_k, num_selfEva, evaDemand):
-
-
+def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas):
+    
     resources = []
+    capacities = []
+    
     for index in range(num_i):
-        resource = Resource(num_h, num_k)
+        resource = Resource(num_h)
+        if(index < numClas):
+            resource.clas = index
+        else:
+            resource.clas = 0
         resources.append(resource)
-
+        
+        capacities.append(resource.capacity)
+            
     sourcePosition = [random.randint(1, 10), random.randint(49, 51) ]
     
     source = Node(sourcePosition,"source", 1)
@@ -27,7 +36,18 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_k, num_selfEva, evaDeman
         area = EvaArea(position, "evaArea", index)
         area.evaDemand = evaDemand
         areas.append(area)
+
     
+    min_k = math.ceil((sum(areas[a].evaDemand for a in range(num_a)))/(sum(resources[i].capacity for i in range(num_i))))
+    max_k = math.floor((sum(areas[a].evaDemand for a in range(num_a))/(min(capacities))))
+
+    num_k = random.randint(min_k, max_k)
+
+    for resource in resources:
+        resource.maxTrips = num_k
+        print(num_k)
+
+        
     initialLocations = []
     for index in range(num_h):
         position = [random.randint(10, 15), random.randint(1, 99) ]
@@ -45,108 +65,95 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_k, num_selfEva, evaDeman
         position = [random.randint(61, 85), random.randint(1, 99) ]
         shelter = PickDropPoint(position, "shelter", index)
         shelters.append(shelter)
-
-
     
-    alfa = []                                                                   # from source s to area a
-    for area in areas:
-        arc =  Arc(source, area, 0, "alfa")
-        alfa.append(arc)
+    alfa = dict()                                                                   # from source s to area a
+    for a in range(num_a):
+        arc =  Arc(source, areas[a], 0, "alfa")
+        keys = 0, a
+        alfa[keys] = arc
 
 
-    beta = []                                                                   # Area 𝑎 to pick-up 𝑏 of trip 𝑘 for resource i
-    for resource in resources:
-        beta_k = []
+    beta = dict()                                                                   # Area 𝑎 to pick-up 𝑏 of trip 𝑘 for resource i
+    for i in range(num_i):
+        resource = resources[i]
         for k in range(resource.maxTrips):
             resource.trip = k
             resource.speed = 0
-            arcs_A = []
             for a_i in range(num_a):
-                arcsA_B = []
-                startNode = areas[a_i-1]
+                startNode = areas[a_i]
                 for b_i in range(num_b):
-                    endNode = pickUpPoints[b_i-1]
+                    endNode = pickUpPoints[b_i]
                     arc = Arc(startNode, endNode, 0, "beta")
                     arc.trip = k
-                    arcsA_B.append(arc)
-                arcs_A.append(arcsA_B)
-            beta_k.append(arcs_A)
-        beta.append(beta_k)
+                    keys = i, k, a_i, b_i
+                    beta[keys] = arc
 
 
-    gamma = []                                                                  # Pick-up 𝑏 to drop-off 𝑐 of trip 𝑘 for resource i
-    for resource in resources:
-        gamma_k = []
+
+    #gamma = []                                                                  # Pick-up 𝑏 to drop-off 𝑐 of trip 𝑘 for resource i
+    gamma = dict()
+    for i in range(num_i):
+        resource = resources[i]
         for k in range(resource.maxTrips):
             resource.trip = k
             resource.speed = 25
-            arcs_B = []
-            
             for b_i in range(num_b):
-                arcsB_C = []
-                startNode = pickUpPoints[b_i-1]
+                startNode = pickUpPoints[b_i]
                 for c_i in range(num_c):
-                    endNode = shelters[c_i-1]
+                    endNode = shelters[c_i]
                     arc = Arc(startNode, endNode, resource, "gamma")
-                    
-                    arcsB_C.append(arc)
-                arcs_B.append(arcsB_C)
-            gamma_k.append(arcs_B)
-        gamma.append(gamma_k)
+                    if arc.isLegit():
+                        keys = i, k, b_i, c_i
+                        gamma[keys] = arc
+
+
+    print(gamma[0,0,0,0])
 
     
-    delta = []                                                                  # Drop-off 𝑐 to pick-up 𝑏 of trip 𝑘 to trip 𝑘 + 1 , For resource 𝑖, for 𝑘 = 1,… , 𝐾 − 1 
-    for resource in resources:
-        delta_k = []
+    delta = dict()                                                                 # Drop-off 𝑐 to pick-up 𝑏 of trip 𝑘 to trip 𝑘 + 1 , For resource 𝑖, for 𝑘 = 1,… , 𝐾 − 1 
+    for i in range(num_i):
         for k in range(resource.maxTrips):
             resource.trip = k
             resource.speed = 40
-            arcs_C = []
-            
+                       
             for c_i in range(num_c):
-                arcsC_B = []
-                startNode = shelters[c_i-1]
+                startNode = shelters[c_i]
                 for b_i in range(num_b):
-                    endNode = pickUpPoints[b_i-1]
+                    endNode = pickUpPoints[b_i]
                     arc = Arc(startNode, endNode, resource, "delta")
                     arc.trip = k
-                    arcsC_B.append(arc)
-                arcs_C.append(arcsC_B)
-            delta_k.append(arcs_C)
-        delta.append(delta_k)
+                    if arc.isLegit():
+                        keys = i, k, c_i, b_i
+                        delta[keys] = arc
 
     
-    epsilon = []                                                                # Drop-off 𝑐 to sink node t
-    for shelter in shelters:
-        startNode = shelter
+    epsilon = dict()                                                                # Drop-off 𝑐 to sink node t
+    for c in range(num_c):
+        startNode = shelters[c]
         arc = Arc(startNode, sink, 0, "epsilon")
-        arc.trip = k
-        epsilon.append(arc)
+        keys = c, 0
+        epsilon[keys] = arc
                 
     
-    psi = []                                                                    # Initial resource location ℎ to pick-up b
-    for resource in resources:
-        arcs_H = []
+    psi = dict()                                                                    # Initial resource location ℎ to pick-up b
+    for i in range(num_i):
         for h_i in range(num_h):
-            arcsH_B = []
-            startNode = initialLocations[h_i-1]
+            
+            startNode = initialLocations[h_i]
             for b_i in range(num_b):
-                endNode = pickUpPoints[b_i-1]
+                endNode = pickUpPoints[b_i]
                 arc = Arc(startNode, endNode, resource, "psi")
-                arcsH_B.append(arc)
-            arcs_H.append(arcsH_B)
-        psi.append(arcs_H)
+                keys = i, h_i, b_i
+                psi[keys] = arc
 
-    lmbda = []                                                                  # from area a to sink t
-    for area in areas:
-        
-        area.selfEva = num_selfEva
-        startNode = area
+    lmbda = dict()                                                        # from area a to sink t
+    for a in range(num_a):
+        areas[a].selfEva = num_selfEva
+        startNode = areas[a]
         arc = Arc(startNode, sink, 0, "lmbda")
-        arc.trip = k
-        lmbda.append(arc)
-
-
+        #arc.trip = k
+        keys = a, 0
+        lmbda[keys] = arc
 
 
     data = dict()
@@ -167,7 +174,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_k, num_selfEva, evaDeman
     data['arcs']['psi'] = psi
     data['arcs']['lmbda'] = lmbda
     data['params'] = dict()
-    data['params']['i'] = num_i #num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
+    data['params']['i'] = len(resources) #num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
     data['params']['a'] = num_a
     data['params']['b'] = num_b
     data['params']['h'] = num_h
@@ -176,22 +183,12 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_k, num_selfEva, evaDeman
     data['params']['self'] = num_selfEva
     data['params']['demand'] = evaDemand
 
-
-
-    with open(os.path.join(os.path.dirname(__file__),'config.toml'),'w') as f:
-        toml.dump(data, f)
-
+    # with open(os.path.join(os.path.dirname(__file__),'config.toml'),'w') as f:
+    #     toml.dump(data, f)
 
     return data
 
 
 
-
-def generateGridMap(num_i, num_a, num_h, num_b, num_c):
-    size = 100
-
-    
-
-
 if __name__ == "__main__":
-    generateData(3, 2, 2, 2, 2)
+    generateData(3, 2, 2, 2, 2, 2, 25, 2)

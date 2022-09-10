@@ -23,8 +23,7 @@ class Utils:
         
         xm = x1 + (x2 - x1)/2
         ym = y1 + (y2 - y1)/2
-        print(x1, " : ", x2, " middle is: ", xm)
-        print(y1, " : ", y2, " middle is: ", ym)
+        
         return xm, ym
     
     def getKeys(name):
