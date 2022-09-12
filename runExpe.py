@@ -162,9 +162,7 @@ def runExpe(data):
 
 
     
-    FL_a_t = D_ICEP.addVars([(a, t) for a in range(num_a) for t in range(num_t)], vtype=gb.GRB.INTEGER, name="flowLmbda")
-
-
+    FL_a_t = D_ICEP.addVars([(a, t) for (a, t) in lmbda.keys()], vtype=gb.GRB.INTEGER, name="flowLmbda")
     FL_i_k_ab = D_ICEP.addVars([(i, k, a, b) for i in range(num_i) for k in range(num_k) for a in range(num_a) for b in range(num_b) ], vtype=gb.GRB.INTEGER, name="flowBeta")
     FL_i_k_bc = D_ICEP.addVars([(i, k, b, c) for i in range(num_i) for k in range(num_k) for b in range(num_b) for c in range(num_c) ], vtype=gb.GRB.INTEGER, name="flowGamma")
     FL_i_k_ct = D_ICEP.addVars([(i, k, c, t) for i in range(num_i) for k in range(num_k) for c in range(num_c) for t in range(num_t) ], vtype=gb.GRB.INTEGER, name="flowEpsilon")
@@ -189,28 +187,28 @@ def runExpe(data):
     # for i in range(num_i-1): 
         
     # Eq. 3
-    D_ICEP.addConstrs(((gb.quicksum( psi[i, h, b].cost * W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b) ) 
+    D_ICEP.addConstrs(((gb.quicksum( psi[i, h, b].cost * W_i_1_hb[i, h, b]  for (i, h, b) in psi.keys()) #for h in range(num_h) for b in range(num_b) if (i, h, b) in psi ) 
         + 
-            gb.quicksum(gamma[i, k, b, c].cost * X_i_k_bc[i, k, b, c] for k in range(num_k) for b in range(num_b) for c in range(num_c))
+            gb.quicksum(gamma[i, k, b, c].cost * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) #for k in range(num_k) for b in range(num_b) for c in range(num_c) if(i, k, b, c) in gamma)
         +
-            gb.quicksum(delta[i, k, c, b].cost * Y_i_k_cb[i, k, c, b] for k in range(num_k) for c in range(num_c) for b in range(num_b))
+            gb.quicksum(delta[i, k, c, b].cost * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys()) #for k in range(num_k) for c in range(num_c) for b in range(num_b) if (i, k, c, b) in delta)
         +
-            gb.quicksum(resources[i].timeToAvaiability * W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b)) 
+            gb.quicksum(resources[i].timeToAvaiability * W_i_1_hb[i, h, b] for(i, h, b) in psi.keys())  #for h in range(num_h) for b in range(num_b) if (i, h, b) in psi) 
         +
-            gb.quicksum(resources[i].loadingTime * W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b)) 
+            gb.quicksum(resources[i].loadingTime * W_i_1_hb[i, h, b]  for (i, h, b) in psi.keys())#for h in range(num_h) for b in range(num_b) if (i, h, b) in psi) 
         +
-            gb.quicksum(resources[i].loadingTime * Y_i_k_cb[i, k, c, b] for k in range(num_k) for c in range(num_c) for b in range(num_b))
+            gb.quicksum(resources[i].loadingTime * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys()) #for k in range(num_k) for c in range(num_c) for b in range(num_b) if(i, k, c, b) in delta)
         +
-            gb.quicksum(resources[i].unloadingTime * X_i_k_bc[i, k, b, c] for k in range(num_k) for b in range(num_b) for c in range(num_c) )
+            gb.quicksum(resources[i].unloadingTime * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) #for k in range(num_k) for b in range(num_b) for c in range(num_c) if (i, k, c, b) in delta)
 
         == 
             S_i[i]) for i in range(num_i)) , name="Eq-3")
 
     # Eq. 4
-    D_ICEP.addConstrs((FL_a_t[a, 0] <= lmbda[a].flow for a in range(num_a)),name="Eq-4" )
+    D_ICEP.addConstrs((FL_a_t[a, t] <= lmbda[a, t].flow  for (a, t) in lmbda.keys())) #for a in range(num_a) if(a, 0) in lmbda ) ,name="Eq-4" )
     
     # Eq. 5
-    D_ICEP.addConstrs((FL_i_k_bc[i, k, b, c] <= resources[i].capacity * X_i_k_bc[i, k, b, c] for i in range(num_i) for k in range(num_k) for b in range(num_b) for c in range(num_c)), name="Eq-5")
+    D_ICEP.addConstrs((FL_i_k_bc[i, k, b, c] <= resources[i].capacity * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()))# for i in range(num_i) for k in range(num_k) for b in range(num_b) for c in range(num_c) if (i, k, c, b) in delta ), name="Eq-5")
 
     # Eq. 6
     D_ICEP.addConstrs((evaAreas[a].evaDemand ==  FL_a_t[a, t] + gb.quicksum(FL_i_k_ab[i, k, a, b] for i in range(num_i) for k in range(num_k)  for b in range(num_b)  ) for a in range(num_a) for t in range(num_t)), name="Eq-6")
@@ -266,8 +264,11 @@ def runExpe(data):
     # Eq. 18
     D_ICEP.addConstr((r >= 0), name="Eq-20")
 
-    # Eq. 19
-    #D_ICEP.addConstr
+    # Eq. 19        Added by the stdent: ensures that a road is chosen only if its arc is compatible
+    D_ICEP.addConstrs(W_i_1_hb[i, h, b] <= psi[i, h, b].isLegit() for (i, h, b) in psi)
+    D_ICEP.addConstrs(X_i_k_bc[i, k, b, c] <= gamma[i, k, b, c].isLegit() for (i, k, b, c) in gamma)
+    D_ICEP.addConstrs(Y_i_k_cb[i, k, c, b] <= delta[i, k, c, b].isLegit() for (i, k, c, b) in delta)
+
 
     # Objective
     D_ICEP.setObjective(r)
@@ -290,7 +291,7 @@ def runExpe(data):
 
     else:
         print("--------Gurobi did not find a optiml solution-----------")
-        return D_ICEP.status, D_ICEP.Runtime, None
+        return D_ICEP.status, D_ICEP.Runtime, None, None
 
 
 

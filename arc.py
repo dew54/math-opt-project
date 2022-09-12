@@ -9,6 +9,7 @@ class Arc:
         #self.nodeSet = nodeSet          #   
         self.type = typ                       # If arc is type: alfa, beta, gamma, delta
         self.length = self.getLength()
+        #self.isLegit = bool()
         self.flow = int()
         
         if(typ == "gamma"):
@@ -16,16 +17,19 @@ class Arc:
             self.cost = self.length/resource.loadedSpeed
             self.flow = resource.capacity/self.cost
             self.trip = resource.trip #SERVE???
+            #self.isLegit = self.isLegit()
         elif(typ == "delta"):
             self.resource = resource
             self.cost = self.length/resource.emptySpeed
             self.flow = resource.capacity/self.cost
             self.trip = resource.trip #SERVE???
+            #self.isLegit = self.isLegit()
         elif(typ == "psi"):
             self.resource = resource
             self.cost = self.length/resource.emptySpeed
             self.flow = 0
             self.trip = 0
+            #self.isLegit = self.isLegit()
         elif(typ == "alfa"):
             self.cost = 0
             
@@ -69,9 +73,9 @@ class Arc:
     
     def isLegit(self):
         if self.resource.clas != self.startNode.clas or self.resource.clas !=self.endNode.clas:
-            return False
+            return 0
         else:
-            return True
+            return 1
             
 
     

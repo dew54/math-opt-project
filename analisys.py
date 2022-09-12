@@ -8,16 +8,16 @@ import runExpe
 import generateData
 from utils import Utils
 
-num_i = 2
+num_i = 1
 num_a = 2
-num_b = 2
+num_b = 3
 num_c = 2
 num_h = 2
 num_t = 1
 num_k = 5
 num_selfEva = 3
 evaDemand = 30
-numClas = 2
+numClas = 1
 
 data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)
 
@@ -59,9 +59,9 @@ for i in range(len(vars)):
                 k = int(key[1])
                 b = int(key[2])
                 c = int(key[3])
-                arc = gamma[i][k][b][c]
+                arc = gamma[i, k, b, c]
                 gammaSelected.append(arc)
-                g = gamma[i][k][b][c]
+                g = gamma[i, k, b, c]
                 print(i,k,b,c)
                 if k==0 and i == 0:
                     pStart = g.startNode.position
@@ -82,7 +82,7 @@ for i in range(len(vars)):
             i = int(key[0])
             h = int(key[1])
             b = int(key[2])
-            g = psi[i][h][b]
+            g = psi[i, h, b]
             
             #print(i,k,b,c)
             if i == 0:
@@ -98,7 +98,7 @@ for i in range(len(vars)):
             k = int(key[1])
             b = int(key[2])
             c = int(key[3])
-            g = delta[i][k][b][c]
+            g = delta[i, k, b, c]
             
             #print(i,k,b,c)
             if i == 0 and k == 0:
@@ -166,8 +166,8 @@ plt.plot(position[0], position[1], marker="+", markersize=10, markeredgecolor="g
 
 ### ARCS alfa ####
 for a in alfa:
-    pStart = a.startNode.position
-    pEnd = a.endNode.position
+    pStart = alfa[a].startNode.position
+    pEnd = alfa[a].endNode.position
 
 
     x1, y1 = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
@@ -175,17 +175,16 @@ for a in alfa:
     plt.plot(x1, y1, 'k:')
 
 ### ARCS beta ####
-for a in range(num_a):    
-    for b in beta[0][0][a]:
-        pStart = b.startNode.position
-        pEnd = b.endNode.position
+
+for key in beta:
+        pStart = beta[key].startNode.position
+        pEnd = beta[key].endNode.position
         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-        
         plt.plot(x, y, 'k')
 
-for a in epsilon:
-    pStart = a.startNode.position
-    pEnd = a.endNode.position
+for key in epsilon:
+    pStart = epsilon[key].startNode.position
+    pEnd = epsilon[key].endNode.position
     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
     plt.plot(x, y, 'k:')
 

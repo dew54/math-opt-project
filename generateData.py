@@ -102,9 +102,9 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
                 for c_i in range(num_c):
                     endNode = shelters[c_i]
                     arc = Arc(startNode, endNode, resource, "gamma")
-                    if arc.isLegit():
-                        keys = i, k, b_i, c_i
-                        gamma[keys] = arc
+                    #if arc.isLegit():
+                    keys = i, k, b_i, c_i
+                    gamma[keys] = arc
 
 
     print(gamma[0,0,0,0])
@@ -122,9 +122,9 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
                     endNode = pickUpPoints[b_i]
                     arc = Arc(startNode, endNode, resource, "delta")
                     arc.trip = k
-                    if arc.isLegit():
-                        keys = i, k, c_i, b_i
-                        delta[keys] = arc
+                    #if arc.isLegit():
+                    keys = i, k, c_i, b_i
+                    delta[keys] = arc
 
     
     epsilon = dict()                                                                # Drop-off 𝑐 to sink node t
