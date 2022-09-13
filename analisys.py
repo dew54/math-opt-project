@@ -18,8 +18,9 @@ num_k = 5
 num_selfEva = 3
 evaDemand = 30
 numClas = 1
+numScenarios = 3
 
-data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)
+data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
 
 evaAreas = data["nodes"]["area"]
 initialLocations = data["nodes"]['initial']
@@ -32,21 +33,14 @@ beta = data["arcs"]["beta"]
 gamma = data["arcs"]["gamma"]
 delta = data["arcs"]["delta"]
 epsilon = data["arcs"]["epsilon"]
-psi = data["arcs"]["psi"]
+zeta = data["arcs"]["zeta"]
 lmbda = data["arcs"]["lmbda"]
 
-
-
-
-
-status, runtime, objVal, experiment = runExpe.runExpe(data)
-
-
-
+status, runtime, objVal, experiment = runExpe.runExpeDeterministic(data) 
 
 vars = experiment.getVars()
 gammaSelected = []
-psiSelected = []
+zetaSelected = []
 deltaSelected = []
 gammaObj = []
 for i in range(len(vars)):
@@ -77,12 +71,12 @@ for i in range(len(vars)):
                 #gammaSelected.append(vars[i])
             
                 
-        if "psiSelect" in str(vars[i].VarName):
+        if "zetaSelect" in str(vars[i].VarName):
             key = Utils.getKeys(vars[i].VarName)
             i = int(key[0])
             h = int(key[1])
             b = int(key[2])
-            g = psi[i, h, b]
+            g = zeta[i, h, b]
             
             #print(i,k,b,c)
             if i == 0:

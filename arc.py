@@ -24,7 +24,7 @@ class Arc:
             self.flow = resource.capacity/self.cost
             self.trip = resource.trip #SERVE???
             #self.isLegit = self.isLegit()
-        elif(typ == "psi"):
+        elif(typ == "zeta"):
             self.resource = resource
             self.cost = self.length/resource.emptySpeed
             self.flow = 0

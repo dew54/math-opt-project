@@ -6,8 +6,9 @@ import pandas as pd
 from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *
+from scenario import Scenario
 
-def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas):
+def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios):
     
     resources = []
     capacities = []
@@ -41,7 +42,10 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
     min_k = math.ceil((sum(areas[a].evaDemand for a in range(num_a)))/(sum(resources[i].capacity for i in range(num_i))))
     max_k = math.floor((sum(areas[a].evaDemand for a in range(num_a))/(min(capacities))))
 
-    num_k = random.randint(min_k, max_k)
+    if(min_k==max_k):
+        num_k = min_k
+    else:
+        num_k = random.randint(min_k, max_k)
 
     for resource in resources:
         resource.maxTrips = num_k
@@ -135,16 +139,16 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
         epsilon[keys] = arc
                 
     
-    psi = dict()                                                                    # Initial resource location ℎ to pick-up b
+    zeta = dict()                                                                    # Initial resource location ℎ to pick-up b
     for i in range(num_i):
         for h_i in range(num_h):
             
             startNode = initialLocations[h_i]
             for b_i in range(num_b):
                 endNode = pickUpPoints[b_i]
-                arc = Arc(startNode, endNode, resource, "psi")
+                arc = Arc(startNode, endNode, resource, "zeta")
                 keys = i, h_i, b_i
-                psi[keys] = arc
+                zeta[keys] = arc
 
     lmbda = dict()                                                        # from area a to sink t
     for a in range(num_a):
@@ -155,8 +159,17 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
         keys = a, 0
         lmbda[keys] = arc
 
+    scenarios = []
+
+    for s in range(numScenarios):
+        scenario = Scenario()
+        scenario.populate()
+        scenarios.append(scenario)
+
+
 
     data = dict()
+    data['scenarios'] = scenarios
     data['resources'] = resources
     data['nodes'] = dict()
     data['nodes']['source'] = source
@@ -171,7 +184,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
     data['arcs']['gamma'] = gamma
     data['arcs']['delta'] = delta
     data['arcs']['epsilon'] = epsilon
-    data['arcs']['psi'] = psi
+    data['arcs']['zeta'] = zeta
     data['arcs']['lmbda'] = lmbda
     data['params'] = dict()
     data['params']['i'] = len(resources) #num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand

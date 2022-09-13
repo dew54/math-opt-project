@@ -5,6 +5,8 @@ class Resource:
         self.trip = 0
         self.speed = 0
         self.clas = 0
+        self.fixedCost = int()
+        self.varCost = int()
         self.populate(num_h)
         # self.capacity =             # q: Passenger capacity of resource i
         # self.timeToAvaiability      # u: Time to availability of resource i
@@ -20,7 +22,8 @@ class Resource:
         self.capacity = random.randint(5,15)
         self.timeToAvaiability = random.randint(10, 30)
         self.loadingTime = random.randint(5, 15)
-       
+        self.fixedCost = random.randint(5, 15)
+        self.varCost = random.randint(10, 15) # cost per unit time
         #self.loadingTime = self.loadingTime + (self.capacity + self.loadingTime)/self.capacity
         self.unloadingTime = random.randint(5, 15)
         self.emptySpeed = 40
@@ -28,5 +31,9 @@ class Resource:
         #self.type = 1           #tipo dock, airport strips
         self.maxTrips = 0     #da impostare settabile poi
         self.initialLocation = random.randint(1, num_h )
+    
+    def getVarCost(self, T):
+        cost = self.varCost * T
+        return cost
         
         
