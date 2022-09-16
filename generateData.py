@@ -2,7 +2,7 @@ import math
 import random
 import os
 import toml
-import pandas as pd
+#import pandas as pd
 from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *

@@ -16,6 +16,7 @@ Minimize multi-objectives
    + 100 numNotEva[9,1] + totalTime
 Subject To
  Eq-2[0]: timeForResourceI[0] - totalTime <= 0
+<<<<<<< HEAD
  Eq-2[1]: timeForResourceI[1] - totalTime <= 0
  Eq-3[0]: 47 zetaSelect[0,0,0] + 57 zetaSelect[0,0,1]
    + 58 zetaSelect[0,0,2] + 63 zetaSelect[0,1,0] + 73.5 zetaSelect[0,1,1]
@@ -177,6 +178,156 @@ Subject To
  R51: flowGamma[1,3,1,1] - 7 gammaSelect[1,3,1,1] <= 0
  R52: flowGamma[1,3,2,0] - 7 gammaSelect[1,3,2,0] <= 0
  R53: flowGamma[1,3,2,1] - 7 gammaSelect[1,3,2,1] <= 0
+=======
+ Eq-3[0]: 26.375 zetaSelect[0,0,0] + 27.25 zetaSelect[0,0,1]
+   + 26 zetaSelect[0,0,2] + 26.175 zetaSelect[0,1,0]
+   + 26.8 zetaSelect[0,1,1] + 26.125 zetaSelect[0,1,2]
+   + 16.76 gammaSelect[0,0,0,0] + 15.52 gammaSelect[0,0,0,1]
+   + 18.68 gammaSelect[0,0,1,0] + 16.72 gammaSelect[0,0,1,1]
+   + 15.76 gammaSelect[0,0,2,0] + 16.6 gammaSelect[0,0,2,1]
+   + 16.76 gammaSelect[0,1,0,0] + 15.52 gammaSelect[0,1,0,1]
+   + 18.68 gammaSelect[0,1,1,0] + 16.72 gammaSelect[0,1,1,1]
+   + 15.76 gammaSelect[0,1,2,0] + 16.6 gammaSelect[0,1,2,1]
+   + 16.76 gammaSelect[0,2,0,0] + 15.52 gammaSelect[0,2,0,1]
+   + 18.68 gammaSelect[0,2,1,0] + 16.72 gammaSelect[0,2,1,1]
+   + 15.76 gammaSelect[0,2,2,0] + 16.6 gammaSelect[0,2,2,1]
+   + 16.76 gammaSelect[0,3,0,0] + 15.52 gammaSelect[0,3,0,1]
+   + 18.68 gammaSelect[0,3,1,0] + 16.72 gammaSelect[0,3,1,1]
+   + 15.76 gammaSelect[0,3,2,0] + 16.6 gammaSelect[0,3,2,1]
+   + 16.76 gammaSelect[0,4,0,0] + 15.52 gammaSelect[0,4,0,1]
+   + 18.68 gammaSelect[0,4,1,0] + 16.72 gammaSelect[0,4,1,1]
+   + 15.76 gammaSelect[0,4,2,0] + 16.6 gammaSelect[0,4,2,1]
+   + 16.76 gammaSelect[0,5,0,0] + 15.52 gammaSelect[0,5,0,1]
+   + 18.68 gammaSelect[0,5,1,0] + 16.72 gammaSelect[0,5,1,1]
+   + 15.76 gammaSelect[0,5,2,0] + 16.6 gammaSelect[0,5,2,1]
+   + 16.76 gammaSelect[0,6,0,0] + 15.52 gammaSelect[0,6,0,1]
+   + 18.68 gammaSelect[0,6,1,0] + 16.72 gammaSelect[0,6,1,1]
+   + 15.76 gammaSelect[0,6,2,0] + 16.6 gammaSelect[0,6,2,1]
+   + 16.76 gammaSelect[0,7,0,0] + 15.52 gammaSelect[0,7,0,1]
+   + 18.68 gammaSelect[0,7,1,0] + 16.72 gammaSelect[0,7,1,1]
+   + 15.76 gammaSelect[0,7,2,0] + 16.6 gammaSelect[0,7,2,1]
+   + 16.76 gammaSelect[0,8,0,0] + 15.52 gammaSelect[0,8,0,1]
+   + 18.68 gammaSelect[0,8,1,0] + 16.72 gammaSelect[0,8,1,1]
+   + 15.76 gammaSelect[0,8,2,0] + 16.6 gammaSelect[0,8,2,1]
+   + 16.76 gammaSelect[0,9,0,0] + 15.52 gammaSelect[0,9,0,1]
+   + 18.68 gammaSelect[0,9,1,0] + 16.72 gammaSelect[0,9,1,1]
+   + 15.76 gammaSelect[0,9,2,0] + 16.6 gammaSelect[0,9,2,1]
+   + 13.1 deltaSelect[0,0,0,0] + 14.3 deltaSelect[0,0,0,1]
+   + 12.475 deltaSelect[0,0,0,2] + 12.325 deltaSelect[0,0,1,0]
+   + 13.075 deltaSelect[0,0,1,1] + 13 deltaSelect[0,0,1,2]
+   + 13.1 deltaSelect[0,1,0,0] + 14.3 deltaSelect[0,1,0,1]
+   + 12.475 deltaSelect[0,1,0,2] + 12.325 deltaSelect[0,1,1,0]
+   + 13.075 deltaSelect[0,1,1,1] + 13 deltaSelect[0,1,1,2]
+   + 13.1 deltaSelect[0,2,0,0] + 14.3 deltaSelect[0,2,0,1]
+   + 12.475 deltaSelect[0,2,0,2] + 12.325 deltaSelect[0,2,1,0]
+   + 13.075 deltaSelect[0,2,1,1] + 13 deltaSelect[0,2,1,2]
+   + 13.1 deltaSelect[0,3,0,0] + 14.3 deltaSelect[0,3,0,1]
+   + 12.475 deltaSelect[0,3,0,2] + 12.325 deltaSelect[0,3,1,0]
+   + 13.075 deltaSelect[0,3,1,1] + 13 deltaSelect[0,3,1,2]
+   + 13.1 deltaSelect[0,4,0,0] + 14.3 deltaSelect[0,4,0,1]
+   + 12.475 deltaSelect[0,4,0,2] + 12.325 deltaSelect[0,4,1,0]
+   + 13.075 deltaSelect[0,4,1,1] + 13 deltaSelect[0,4,1,2]
+   + 13.1 deltaSelect[0,5,0,0] + 14.3 deltaSelect[0,5,0,1]
+   + 12.475 deltaSelect[0,5,0,2] + 12.325 deltaSelect[0,5,1,0]
+   + 13.075 deltaSelect[0,5,1,1] + 13 deltaSelect[0,5,1,2]
+   + 13.1 deltaSelect[0,6,0,0] + 14.3 deltaSelect[0,6,0,1]
+   + 12.475 deltaSelect[0,6,0,2] + 12.325 deltaSelect[0,6,1,0]
+   + 13.075 deltaSelect[0,6,1,1] + 13 deltaSelect[0,6,1,2]
+   + 13.1 deltaSelect[0,7,0,0] + 14.3 deltaSelect[0,7,0,1]
+   + 12.475 deltaSelect[0,7,0,2] + 12.325 deltaSelect[0,7,1,0]
+   + 13.075 deltaSelect[0,7,1,1] + 13 deltaSelect[0,7,1,2]
+   + 13.1 deltaSelect[0,8,0,0] + 14.3 deltaSelect[0,8,0,1]
+   + 12.475 deltaSelect[0,8,0,2] + 12.325 deltaSelect[0,8,1,0]
+   + 13.075 deltaSelect[0,8,1,1] + 13 deltaSelect[0,8,1,2]
+   + 13.1 deltaSelect[0,9,0,0] + 14.3 deltaSelect[0,9,0,1]
+   + 12.475 deltaSelect[0,9,0,2] + 12.325 deltaSelect[0,9,1,0]
+   + 13.075 deltaSelect[0,9,1,1] + 13 deltaSelect[0,9,1,2]
+   - timeForResourceI[0] = 0
+ R2: flowLmbda[0,0] <= 3
+ R3: flowLmbda[1,0] <= 3
+ R4: flowGamma[0,0,0,0] - 6 gammaSelect[0,0,0,0] <= 0
+ R5: flowGamma[0,0,0,1] - 6 gammaSelect[0,0,0,1] <= 0
+ R6: flowGamma[0,0,1,0] - 6 gammaSelect[0,0,1,0] <= 0
+ R7: flowGamma[0,0,1,1] - 6 gammaSelect[0,0,1,1] <= 0
+ R8: flowGamma[0,0,2,0] - 6 gammaSelect[0,0,2,0] <= 0
+ R9: flowGamma[0,0,2,1] - 6 gammaSelect[0,0,2,1] <= 0
+ R10: flowGamma[0,1,0,0] - 6 gammaSelect[0,1,0,0] <= 0
+ R11: flowGamma[0,1,0,1] - 6 gammaSelect[0,1,0,1] <= 0
+ R12: flowGamma[0,1,1,0] - 6 gammaSelect[0,1,1,0] <= 0
+ R13: flowGamma[0,1,1,1] - 6 gammaSelect[0,1,1,1] <= 0
+ R14: flowGamma[0,1,2,0] - 6 gammaSelect[0,1,2,0] <= 0
+ R15: flowGamma[0,1,2,1] - 6 gammaSelect[0,1,2,1] <= 0
+ R16: flowGamma[0,2,0,0] - 6 gammaSelect[0,2,0,0] <= 0
+ R17: flowGamma[0,2,0,1] - 6 gammaSelect[0,2,0,1] <= 0
+ R18: flowGamma[0,2,1,0] - 6 gammaSelect[0,2,1,0] <= 0
+ R19: flowGamma[0,2,1,1] - 6 gammaSelect[0,2,1,1] <= 0
+ R20: flowGamma[0,2,2,0] - 6 gammaSelect[0,2,2,0] <= 0
+ R21: flowGamma[0,2,2,1] - 6 gammaSelect[0,2,2,1] <= 0
+ R22: flowGamma[0,3,0,0] - 6 gammaSelect[0,3,0,0] <= 0
+ R23: flowGamma[0,3,0,1] - 6 gammaSelect[0,3,0,1] <= 0
+ R24: flowGamma[0,3,1,0] - 6 gammaSelect[0,3,1,0] <= 0
+ R25: flowGamma[0,3,1,1] - 6 gammaSelect[0,3,1,1] <= 0
+ R26: flowGamma[0,3,2,0] - 6 gammaSelect[0,3,2,0] <= 0
+ R27: flowGamma[0,3,2,1] - 6 gammaSelect[0,3,2,1] <= 0
+ R28: flowGamma[0,4,0,0] - 6 gammaSelect[0,4,0,0] <= 0
+ R29: flowGamma[0,4,0,1] - 6 gammaSelect[0,4,0,1] <= 0
+ R30: flowGamma[0,4,1,0] - 6 gammaSelect[0,4,1,0] <= 0
+ R31: flowGamma[0,4,1,1] - 6 gammaSelect[0,4,1,1] <= 0
+ R32: flowGamma[0,4,2,0] - 6 gammaSelect[0,4,2,0] <= 0
+ R33: flowGamma[0,4,2,1] - 6 gammaSelect[0,4,2,1] <= 0
+ R34: flowGamma[0,5,0,0] - 6 gammaSelect[0,5,0,0] <= 0
+ R35: flowGamma[0,5,0,1] - 6 gammaSelect[0,5,0,1] <= 0
+ R36: flowGamma[0,5,1,0] - 6 gammaSelect[0,5,1,0] <= 0
+ R37: flowGamma[0,5,1,1] - 6 gammaSelect[0,5,1,1] <= 0
+ R38: flowGamma[0,5,2,0] - 6 gammaSelect[0,5,2,0] <= 0
+ R39: flowGamma[0,5,2,1] - 6 gammaSelect[0,5,2,1] <= 0
+ R40: flowGamma[0,6,0,0] - 6 gammaSelect[0,6,0,0] <= 0
+ R41: flowGamma[0,6,0,1] - 6 gammaSelect[0,6,0,1] <= 0
+ R42: flowGamma[0,6,1,0] - 6 gammaSelect[0,6,1,0] <= 0
+ R43: flowGamma[0,6,1,1] - 6 gammaSelect[0,6,1,1] <= 0
+ R44: flowGamma[0,6,2,0] - 6 gammaSelect[0,6,2,0] <= 0
+ R45: flowGamma[0,6,2,1] - 6 gammaSelect[0,6,2,1] <= 0
+ R46: flowGamma[0,7,0,0] - 6 gammaSelect[0,7,0,0] <= 0
+ R47: flowGamma[0,7,0,1] - 6 gammaSelect[0,7,0,1] <= 0
+ R48: flowGamma[0,7,1,0] - 6 gammaSelect[0,7,1,0] <= 0
+ R49: flowGamma[0,7,1,1] - 6 gammaSelect[0,7,1,1] <= 0
+ R50: flowGamma[0,7,2,0] - 6 gammaSelect[0,7,2,0] <= 0
+ R51: flowGamma[0,7,2,1] - 6 gammaSelect[0,7,2,1] <= 0
+ R52: flowGamma[0,8,0,0] - 6 gammaSelect[0,8,0,0] <= 0
+ R53: flowGamma[0,8,0,1] - 6 gammaSelect[0,8,0,1] <= 0
+ R54: flowGamma[0,8,1,0] - 6 gammaSelect[0,8,1,0] <= 0
+ R55: flowGamma[0,8,1,1] - 6 gammaSelect[0,8,1,1] <= 0
+ R56: flowGamma[0,8,2,0] - 6 gammaSelect[0,8,2,0] <= 0
+ R57: flowGamma[0,8,2,1] - 6 gammaSelect[0,8,2,1] <= 0
+ R58: flowGamma[0,9,0,0] - 6 gammaSelect[0,9,0,0] <= 0
+ R59: flowGamma[0,9,0,1] - 6 gammaSelect[0,9,0,1] <= 0
+ R60: flowGamma[0,9,1,0] - 6 gammaSelect[0,9,1,0] <= 0
+ R61: flowGamma[0,9,1,1] - 6 gammaSelect[0,9,1,1] <= 0
+ R62: flowGamma[0,9,2,0] - 6 gammaSelect[0,9,2,0] <= 0
+ R63: flowGamma[0,9,2,1] - 6 gammaSelect[0,9,2,1] <= 0
+ Eq-6[0,0]: flowLmbda[0,0] + flowBeta[0,0,0,0] + flowBeta[0,0,0,1]
+   + flowBeta[0,0,0,2] + flowBeta[0,1,0,0] + flowBeta[0,1,0,1]
+   + flowBeta[0,1,0,2] + flowBeta[0,2,0,0] + flowBeta[0,2,0,1]
+   + flowBeta[0,2,0,2] + flowBeta[0,3,0,0] + flowBeta[0,3,0,1]
+   + flowBeta[0,3,0,2] + flowBeta[0,4,0,0] + flowBeta[0,4,0,1]
+   + flowBeta[0,4,0,2] + flowBeta[0,5,0,0] + flowBeta[0,5,0,1]
+   + flowBeta[0,5,0,2] + flowBeta[0,6,0,0] + flowBeta[0,6,0,1]
+   + flowBeta[0,6,0,2] + flowBeta[0,7,0,0] + flowBeta[0,7,0,1]
+   + flowBeta[0,7,0,2] + flowBeta[0,8,0,0] + flowBeta[0,8,0,1]
+   + flowBeta[0,8,0,2] + flowBeta[0,9,0,0] + flowBeta[0,9,0,1]
+   + flowBeta[0,9,0,2] = 30
+ Eq-6[1,0]: flowLmbda[1,0] + flowBeta[0,0,1,0] + flowBeta[0,0,1,1]
+   + flowBeta[0,0,1,2] + flowBeta[0,1,1,0] + flowBeta[0,1,1,1]
+   + flowBeta[0,1,1,2] + flowBeta[0,2,1,0] + flowBeta[0,2,1,1]
+   + flowBeta[0,2,1,2] + flowBeta[0,3,1,0] + flowBeta[0,3,1,1]
+   + flowBeta[0,3,1,2] + flowBeta[0,4,1,0] + flowBeta[0,4,1,1]
+   + flowBeta[0,4,1,2] + flowBeta[0,5,1,0] + flowBeta[0,5,1,1]
+   + flowBeta[0,5,1,2] + flowBeta[0,6,1,0] + flowBeta[0,6,1,1]
+   + flowBeta[0,6,1,2] + flowBeta[0,7,1,0] + flowBeta[0,7,1,1]
+   + flowBeta[0,7,1,2] + flowBeta[0,8,1,0] + flowBeta[0,8,1,1]
+   + flowBeta[0,8,1,2] + flowBeta[0,9,1,0] + flowBeta[0,9,1,1]
+   + flowBeta[0,9,1,2] = 30
+>>>>>>> 9820d6f169c0ed27bf8ade78aadcf213bce4df2e
  Eq-7[0,0,0]: flowBeta[0,0,0,0] + flowBeta[0,0,1,0] - flowGamma[0,0,0,0]
    - flowGamma[0,0,0,1] = 0
  Eq-7[0,0,1]: flowBeta[0,0,0,1] + flowBeta[0,0,1,1] - flowGamma[0,0,1,0]
