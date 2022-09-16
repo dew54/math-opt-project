@@ -50,5 +50,5 @@ coverage.xml
 docs/_build/
 
 # Gurobi model and solution
-mymodel.lp
-solution.sol
+*.lp
+*.sol
