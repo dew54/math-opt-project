@@ -5,20 +5,23 @@ from matplotlib import collections  as mc
 
 
 import runExpe
+import runExpeStoc
 import generateData
 from utils import Utils
 
-num_i = 1
+num_i = 2
 num_a = 2
 num_b = 3
 num_c = 2
-num_h = 2
+num_h = 3
 num_t = 1
 num_k = 5
 num_selfEva = 3
 evaDemand = 30
 numClas = 1
-numScenarios = 3
+numScenarios = 10
+upperTimeLimit = 100
+penalty = 100
 
 data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
 
@@ -36,7 +39,8 @@ epsilon = data["arcs"]["epsilon"]
 zeta = data["arcs"]["zeta"]
 lmbda = data["arcs"]["lmbda"]
 
-status, runtime, objVal, experiment = runExpe.runExpeDeterministic(data) 
+#status, runtime, objVal, experiment = runExpe.runExpe(data)
+status, runtime, objVal, experiment = runExpeStoc.runExpeStochastic(data, upperTimeLimit, penalty)
 
 vars = experiment.getVars()
 gammaSelected = []
@@ -105,7 +109,7 @@ for i in range(len(vars)):
                 pStart = g.startNode.position
                 pEnd = g.endNode.position
                 x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-                plt.plot(x, y, 'g--')
+                plt.plot(x, y, 'b--')
 
             deltaSelected.append(vars[i])
 
@@ -174,7 +178,7 @@ for key in beta:
         pStart = beta[key].startNode.position
         pEnd = beta[key].endNode.position
         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-        plt.plot(x, y, 'k')
+        plt.plot(x, y, 'k--')
 
 for key in epsilon:
     pStart = epsilon[key].startNode.position

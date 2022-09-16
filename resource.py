@@ -22,12 +22,12 @@ class Resource:
         self.capacity = random.randint(5,15)
         self.timeToAvaiability = random.randint(10, 30)
         self.loadingTime = random.randint(5, 15)
-        self.fixedCost = random.randint(5, 15)
-        self.varCost = random.randint(10, 15) # cost per unit time
+        self.fixedCost = random.randint(70, 100)
+        self.varCost =  random.randint(3, 8) # cost per unit time
         #self.loadingTime = self.loadingTime + (self.capacity + self.loadingTime)/self.capacity
         self.unloadingTime = random.randint(5, 15)
-        self.emptySpeed = 40
-        self.loadedSpeed = 25
+        self.emptySpeed = 2
+        self.loadedSpeed = 1
         #self.type = 1           #tipo dock, airport strips
         self.maxTrips = 0     #da impostare settabile poi
         self.initialLocation = random.randint(1, num_h )

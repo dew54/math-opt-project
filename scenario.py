@@ -9,5 +9,5 @@ class Scenario:
 
     def populate(self):
         self.weather = random.randint(1, 5)
-        self.evaDemand = random.randint(25, 50)
+        self.evaDemand = random.randint(40, 50)
         self.night = int(1/(random.randint(1,5)))
