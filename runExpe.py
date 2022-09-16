@@ -1,4 +1,6 @@
-from re import T
+import statistics
+
+#from re import T
 from unicodedata import name
 from matplotlib import pyplot as plt
 from matplotlib import collections  as mc
@@ -311,6 +313,7 @@ def runExpeStochastic(data, upperTimeLimit, penalty):
     num_k = data['params']['k']
     num_selfEva = data['params']['self'] 
     evaDemand = data['params']['demand'] 
+    num_s = data['params']['s']
 
 
 
@@ -340,8 +343,10 @@ def runExpeStochastic(data, upperTimeLimit, penalty):
     X_i_k_bc = S_ICEP.addVars([(i, k, b, c) for i in range(num_i) for k in range(num_k) for b in range(num_b)  for c in range(num_c)], vtype=gb.GRB.BINARY, name="gammaSelect")
     Y_i_k_cb = S_ICEP.addVars([(i, k, c, b) for i in range(num_i) for k in range(num_k) for c in range(num_c) for b in range(num_b) ], vtype=gb.GRB.BINARY, name="deltaSelect")
     S_i = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="timeForResourceI")
-    Z_i = S_ICEP.addVar([(i) for i in range(num_i)], vtype=gb.GRB.BINARY, name="isResInFleet")
-    N_a = S_ICEP.addVar([a for a in range(num_a)], vtype=gb.GRB.INTEGER, name="numNotEva")
+    Z_i = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.BINARY, name="isResInFleet")
+
+    N_a = S_ICEP.addVars([(s, a) for s in range(num_s) for a in range(num_a)], vtype=gb.GRB.INTEGER, name="numNotEva")
+    C_z_xi = S_ICEP.addVars([(s) for s in range(num_s)])
     r = S_ICEP.addVar(vtype=gb.GRB.INTEGER, name="totalTime")
 
 
@@ -443,13 +448,45 @@ def runExpeStochastic(data, upperTimeLimit, penalty):
     S_ICEP.addConstrs((gb.quicksum(Y_i_k_cb[i, k, c, b] for c in range(num_c) for b in range(num_b)) <= Z_i[i] for i in range(num_i) for k in range(num_k) if k != num_k-1 ))
 
     # Eq. 35
-    S_ICEP.addConstr(N_a[a] >= 0 for a in range(num_a))
+    S_ICEP.addConstrs((N_a[s, a] >= 0 )for s in range(num_s) for a in range(num_a))
+
+    # Eq. 36 added by modeller
+    #obj2 = (r +  + P * gb.quicksum(N_a[s, a] for a in range(num_a)) for s in range(num_s)  )
 
 
-    obj1 = ((gb.quicksum(resources[i].fixedCost * Z_i[i]))/(gb.quicksum(resources[i].fixedCost + resources[i].getVarCost(T)))  for i in range(num_i))  # + valore medio del secondo obiettivo
 
-    # obj2 = r + ((gb.quicksum(resources[i].getVarCost(S_i[i])))/(gb.quicksum(resources[i].fixedCost + resources[i].getVarCost(T))) for i in range(num_i))
-    #         + P * gb.quicksum
+    numerator = int()
+    divisor = int()
+
+    for i in range(num_i):
+        numerator = sum(resources[i].getVarCost(S_i[i]) for i in range(num_i))
+        divisor = sum(resources[i].fixedCost + resources[i].getVarCost(T) for i in range(num_i))
+
+    S_ICEP.addConstrs(C_z_xi[s] == (r + numerator/divisor) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a)))) for s in range(num_s))
+
+
+    #obj1 = ((((gb.quicksum(resources[i].fixedCost * Z_i[i]))/(sum(resources[i].fixedCost + resources[i].getVarCost(T))))  +  (gb.quicksum(C_z_xi[s] for s in range(num_s)))/num_s)  for i in range(num_i))  # + valore medio del secondo obiettivo
+    obj2 = (r + numerator/divisor) + (P*(gb.quicksum(N_a[s, a] for s in range(num_s) for a in range(num_a) ))) 
+
+    obj1 = (((gb.quicksum(resources[i].fixedCost * Z_i[i] for i in range(num_i)))/(sum(resources[i].fixedCost + resources[i].getVarCost(T) for i in range(num_i))))) +  ((gb.quicksum(C_z_xi[s] for s in range(num_s)))/num_s)
+
+
+
+
+
+
+    S_ICEP.setObjectiveN(obj1, 0, 1)
+    S_ICEP.setObjectiveN(obj2, 1, 1)
+
+
+    if S_ICEP.status == 2:
+        S_ICEP.write("solution.sol")
+        S_ICEP.write("mymodel.lp")
+        return S_ICEP.status, S_ICEP.Runtime, S_ICEP.ObjVal, S_ICEP
+    else:
+        print("--------Gurobi did not find a optiml solution-----------")
+        return S_ICEP.status, S_ICEP.Runtime, None, None
+              
 
 
 

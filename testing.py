@@ -1,11 +1,16 @@
 import re
 import random
 if __name__ == "__main__":
-    name = 'gammaSelect[0,4,0,0]'
-    result = re.search('\[(.*)\]', name)
-    string = result.group(1).replace(',', '')
-    result = []
-    for i in range(len(string)):
-        result.append(string[i])
 
+    a = dict()
+    a[1] = dict()
+    a[1, 2] = 10
+    a[1, 3] = 20
+    a[2] = dict()
+    a[2, 1] = 100
+
+
+    
+    print(a[1].values())
+    
 

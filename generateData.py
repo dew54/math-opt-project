@@ -2,7 +2,7 @@ import math
 import random
 import os
 import toml
-import pandas as pd
+#import pandas as pd
 from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *
@@ -42,7 +42,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
     min_k = math.ceil((sum(areas[a].evaDemand for a in range(num_a)))/(sum(resources[i].capacity for i in range(num_i))))
     max_k = math.floor((sum(areas[a].evaDemand for a in range(num_a))/(min(capacities))))
 
-    if(min_k==max_k):
+    if(abs(min_k - max_k) <= 1):
         num_k = min_k
     else:
         num_k = random.randint(min_k, max_k)
@@ -193,6 +193,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
     data['params']['h'] = num_h
     data['params']['c'] = num_c
     data['params']['k'] = num_k
+    data['params']['s'] = numScenarios
     data['params']['self'] = num_selfEva
     data['params']['demand'] = evaDemand
 

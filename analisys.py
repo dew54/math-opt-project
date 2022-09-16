@@ -19,6 +19,9 @@ num_selfEva = 3
 evaDemand = 30
 numClas = 1
 numScenarios = 3
+upperTimeLimit = 300
+penalty = 0.8
+
 
 data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
 
@@ -36,7 +39,7 @@ epsilon = data["arcs"]["epsilon"]
 zeta = data["arcs"]["zeta"]
 lmbda = data["arcs"]["lmbda"]
 
-status, runtime, objVal, experiment = runExpe.runExpeDeterministic(data) 
+status, runtime, objVal, experiment = runExpe.runExpeStochastic(data) 
 
 vars = experiment.getVars()
 gammaSelected = []
