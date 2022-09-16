@@ -48,3 +48,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# Gurobi model and solution
+mymodel.lp
+solution.sol
