@@ -34,3 +34,17 @@ class Utils:
             result.append(string[i])
         return result
 
+    def formula(formula):
+        expr = sy.sympify(formula)
+        return expr.evalf()
+
+    def computeCoefficient(scenario, key):
+        a = scenario.weather["wind"][key][scenario.windLevel]
+        b = scenario.weather["rain"][key][scenario.rainLevel]
+        c = scenario.weather["light"][key][scenario.lightLevel]
+        coeff = (a + b + c)/3
+        return coeff
+
+
+
+

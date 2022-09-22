@@ -2,28 +2,33 @@ from unicodedata import name
 from matplotlib import pyplot as plt
 from matplotlib import collections  as mc
 
-
-
 import runExpe
 import runExpeStoc
 import generateData
+import generateSimpleData
 from utils import Utils
 
-num_i = 2
+num_i = 1
 num_a = 2
-num_b = 3
+num_b = 2
 num_c = 2
-num_h = 3
+num_h = 1
 num_t = 1
-num_k = 5
-num_selfEva = 3
-evaDemand = 30
+num_selfEva = 1
+evaDemand = 600
 numClas = 1
-numScenarios = 10
-upperTimeLimit = 100
-penalty = 100
+numScenarios = 5
+upperTimeLimit = 500
+penalty = 7000
+runSotchastic = True
 
-data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
+if runSotchastic:
+    data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
+else:
+    data = generateSimpleData.generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
+
+
+
 
 evaAreas = data["nodes"]["area"]
 initialLocations = data["nodes"]['initial']
@@ -38,10 +43,20 @@ delta = data["arcs"]["delta"]
 epsilon = data["arcs"]["epsilon"]
 zeta = data["arcs"]["zeta"]
 lmbda = data["arcs"]["lmbda"]
+objFunctions = dict()
+objFunctions["bal_1"] = "(r + numerator/divisor) + (P*(gb.quicksum(N_a[s, a] for s in range(num_s) for a in range(num_a))))"
 
-#status, runtime, objVal, experiment = runExpe.runExpe(data)
-status, runtime, objVal, experiment = runExpeStoc.runExpeStochastic(data, upperTimeLimit, penalty)
+#obj = Utils().formula(objFunctions["bal_1"])
 
+
+if runSotchastic:
+    status, runtime, objVal, experiment = runExpeStoc.runExpeStochastic(data, upperTimeLimit, penalty)
+else:
+    status, runtime, objVal, experiment = runExpe.runExpe(data)
+
+
+
+#
 vars = experiment.getVars()
 gammaSelected = []
 zetaSelected = []

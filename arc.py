@@ -76,7 +76,12 @@ class Arc:
             return 0
         else:
             return 1
-            
+
+    def actualCost(self, scenario):
+        #return self.cost
+        coeff = Utils.computeCoefficient(scenario, "drive")
+        self.cost = self.cost * (1 )
+        return self.cost
 
     
 class selfEvaArc(Arc):
