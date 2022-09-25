@@ -18,24 +18,26 @@ class Scenario:
 
         self.probability = int()
         self.evaAreas = []
-
+        self.num_k = int()
              
         self.evaDemand = int()
         self.night = int()
         #self.
 
 
-    def populate(self, numScenarios, evaAreas):
-        self.evaDemand = random.randint(40, 120)
+    def populate(self, numScenarios, evaAreas, evaDemand):
         self.night = int(1/(random.randint(1,5)))
         self.windLevel = random.randint(0, 4)
         self.rainLevel = random.randint(0, 4)
         self.lightLevel = random.randint(0, 4)
         self.severity = int((self.windLevel + self.rainLevel + self.lightLevel)/3) + 1
+
         self.speedCoeff = 1 - Utils.computeCoefficient(self, "drive")
         self.loadingCoeff = 1 + Utils.computeCoefficient(self, "loadingOps")
+          
         self.probability = 1/(numScenarios)
         self.evaAreas = evaAreas
+        
         for area in evaAreas:
-            area.evaDemand = random.randint(200, 700)
+            area.evaDemand = random.randint(evaDemand[0], evaDemand[1])
 

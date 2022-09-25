@@ -7,8 +7,10 @@ from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *
 from scenario import Scenario
+from numpy import random as nprandom
 
-def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios):
+
+def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  numClas, numScenarios):
     random.seed(1)
 
 
@@ -58,36 +60,50 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
     epsilon = dict()
     lmbda = dict()
 
+
+
+    gauss = nprandom.normal(size=(numScenarios))
+    probabilities = []
+    normalizer = sum(abs(gauss[p]) for p in range(numScenarios) )
+    for x in gauss:
+        x = abs(x)
+        probabilities.append(x / normalizer)
+
     scenarios = []
 
     resources = []
+    for x in gauss:
+        x = abs(x)
     for s in range(numScenarios):
         scenario = Scenario()
-        scenario.populate(numScenarios, areas)
-        
+        scenario.populate(numScenarios, areas, evaDemand)
+        scenario.probability = probabilities[s]
+        print(probabilities[s])
+
         scenarios.append(scenario)
 
         capacities = []
         resourcesPerScenario = []
         
         for i in range(num_i):
-            resource = Resource(num_h)
+            resource = Resource(initialLocations)
             resource.setSpeed(scenario.speedCoeff)
             resource.setTimes(scenario.loadingCoeff)
             capacities.append(resource.capacity)
             resourcesPerScenario.append(resource)
         resources.append(resourcesPerScenario)
         
-        min_k = 5# math.ceil((sum(areas[a].evaDemand for a in range(num_a)))/(sum(resources[s][i].capacity for i in range(num_i))))
-        max_k = 7#math.floor((sum(areas[a].evaDemand for a in range(num_a))/(min(capacities))))
+        min_k = math.ceil((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a)))/(sum(resources[s][i].capacity for i in range(num_i))))
+        max_k = math.floor((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a))/(min(capacities))))
+        
+        scenarios[s].num_k = min_k 
+        
+        num_k = min_k 
+        
 
-        if(abs(min_k-max_k) <= 10):
-            num_k = min_k
-        else:
-            num_k = random.randint(min_k, max_k)
 
         for resource in resources[s]:
-            resource.maxTrips = num_k
+            scenarios[s].num_k = num_k
 
         
         
@@ -96,13 +112,16 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
             keys = s, 0, a
             alfa[keys] = arc
 
+    for s in range(numScenarios):
+        scenarios[s].num_k = math.ceil((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a)))/(sum(resources[s][i].capacity for i in range(num_i))))
+
 
 
 
     for s  in range(numScenarios):
         for i in range(num_i):
             resource = resources[s][i]
-            for k in range(resource.maxTrips):
+            for k in range(scenarios[s].num_k):
                 resource.trip = k
                 for a_i in range(num_a):
                     startNode = areas[a_i]
@@ -111,16 +130,14 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
                         arc = Arc(startNode, endNode, 0, "beta")
                         arc.trip = k
                         keys = s, i, k, a_i, b_i
-                        print(keys)
                         beta[keys] = arc
 
 
     for s in range(numScenarios):
         #gamma = []                                                                  # Pick-up 𝑏 to drop-off 𝑐 of trip 𝑘 for resource i
         for i in range(num_i):
-            print(s)
             resource = resources[s][i]
-            for k in range(resource.maxTrips):
+            for k in range(scenarios[s].num_k):
                 resource.trip = k
                 for b_i in range(num_b):
                     startNode = pickUpPoints[b_i]
@@ -133,7 +150,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
 
     for s in range(numScenarios):
         for i in range(num_i):
-            for k in range(resource.maxTrips):
+            for k in range(scenarios[s].num_k):
                 resource.trip = k
                         
                 for c_i in range(num_c):
@@ -171,7 +188,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
             keys = s, a, 0
             lmbda[keys] = arc
 
-        
+    
 
     data = dict()
     data['scenarios'] = scenarios
@@ -200,7 +217,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numC
     data['params']['k'] = num_k
     data['params']['s'] = numScenarios
     data['params']['self'] = num_selfEva
-    data['params']['demand'] = evaDemand
+    #data['params']['demand'] = evaDemand
     
 
     with open('config.yaml','w') as f:

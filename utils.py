@@ -1,5 +1,6 @@
 import math
 import re
+from ast import literal_eval as make_tuple
 
 
 class Utils:
@@ -9,9 +10,8 @@ class Utils:
         x2 = p2[0]
         y2 = p2[1]
         d = int(math.sqrt((x1-x2)**2 + (y1-y2)**2))
+        d = d/10               # Conversion: we assume eva area is 10 x 10 Km wide
         
-        # if d <= 1:
-        #     d = 1
         return d
     
     def middle(p1, p2):
@@ -28,10 +28,10 @@ class Utils:
     
     def getKeys(name):
         result = re.search('\[(.*)\]', name)
-        string = result.group(1).replace(',', '')
-        result = []
-        for i in range(len(string)):
-            result.append(string[i])
+        string = result.group(1)#.replace(',', '')
+        string = '('+ string+')'
+
+        result = make_tuple(string)
         return result
 
     def formula(formula):
@@ -39,10 +39,13 @@ class Utils:
         return expr.evalf()
 
     def computeCoefficient(scenario, key):
+        probability = scenario.probability
+
         a = scenario.weather["wind"][key][scenario.windLevel]
         b = scenario.weather["rain"][key][scenario.rainLevel]
         c = scenario.weather["light"][key][scenario.lightLevel]
         coeff = (a + b + c)/3
+        print(coeff)
         return coeff
 
 

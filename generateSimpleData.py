@@ -6,9 +6,8 @@ import toml
 from resource import Resource
 from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
 from arc import *
-from scenario import Scenario
 
-def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios):
+def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas):
     
     resources = []
     capacities = []
@@ -49,7 +48,6 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
 
     for resource in resources:
         resource.maxTrips = num_k
-        print(num_k)
 
         
     initialLocations = []
@@ -111,7 +109,6 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
                     gamma[keys] = arc
 
 
-    print(gamma[0,0,0,0])
 
     
     delta = dict()                                                                 # Drop-off 𝑐 to pick-up 𝑏 of trip 𝑘 to trip 𝑘 + 1 , For resource 𝑖, for 𝑘 = 1,… , 𝐾 − 1 
@@ -159,17 +156,11 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
         keys = a, 0
         lmbda[keys] = arc
 
-    scenarios = []
-
-    for s in range(numScenarios):
-        scenario = Scenario()
-        scenario.populate()
-        scenarios.append(scenario)
 
 
 
     data = dict()
-    data['scenarios'] = scenarios
+    #data['scenarios'] = scenarios
     data['resources'] = resources
     data['nodes'] = dict()
     data['nodes']['source'] = source
@@ -193,7 +184,7 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
     data['params']['h'] = num_h
     data['params']['c'] = num_c
     data['params']['k'] = num_k
-    data['params']['s'] = numScenarios
+    #data['params']['s'] = numScenarios
     data['params']['self'] = num_selfEva
     data['params']['demand'] = evaDemand
 

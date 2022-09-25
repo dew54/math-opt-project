@@ -1,16 +1,16 @@
 import re
-import random
+from numpy import random
 if __name__ == "__main__":
 
-    a = dict()
-    a[1] = dict()
-    a[1, 2] = 10
-    a[1, 3] = 20
-    a[2] = dict()
-    a[2, 1] = 100
+    numScenarios = 5
+    gauss = random.normal(size=(numScenarios))
+    probability = []
+    normalizer = sum(abs(gauss[p]) for p in range(numScenarios) )
+    for x in gauss:
+        x = abs(x)
+        probability.append(x / normalizer)
+        print(probability)
+    print(sum(probability[s] for s in range(numScenarios)))
 
-
-    
-    print(a[1].values())
     
 

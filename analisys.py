@@ -7,7 +7,7 @@ import runExpeStoc
 import generateData
 import generateSimpleData
 from utils import Utils
-
+from plotting import Plotting
 num_i = 1
 num_a = 2
 num_b = 2
@@ -15,18 +15,17 @@ num_c = 2
 num_h = 1
 num_t = 1
 num_selfEva = 1
-evaDemand = 600
+evaDemand = 60
 numClas = 1
-numScenarios = 5
+numScenarios = 1
 upperTimeLimit = 500
 penalty = 7000
-runSotchastic = True
+runSotchastic = False
 
 if runSotchastic:
     data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
 else:
-    data = generateSimpleData.generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
-
+    data = generateSimpleData.generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)
 
 
 
@@ -47,6 +46,7 @@ objFunctions = dict()
 objFunctions["bal_1"] = "(r + numerator/divisor) + (P*(gb.quicksum(N_a[s, a] for s in range(num_s) for a in range(num_a))))"
 
 #obj = Utils().formula(objFunctions["bal_1"])
+plotting = Plotting(data)
 
 
 if runSotchastic:
@@ -58,165 +58,183 @@ else:
 
 #
 vars = experiment.getVars()
-gammaSelected = []
-zetaSelected = []
-deltaSelected = []
-gammaObj = []
-for i in range(len(vars)):
-    if vars[i].X == 1:
-        
-        if "gammaSelect" in str(vars[i].VarName):
-            
-                key = Utils.getKeys(vars[i].VarName)
-                i = int(key[0])
-                k = int(key[1])
-                b = int(key[2])
-                c = int(key[3])
-                arc = gamma[i, k, b, c]
-                gammaSelected.append(arc)
-                g = gamma[i, k, b, c]
-                print(i,k,b,c)
-                if k==0 and i == 0:
-                    pStart = g.startNode.position
-                    pEnd = g.endNode.position
-                    x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-                    plt.plot(x, y, 'r')
-                if k==1 and i == 0:
-                    pStart = g.startNode.position
-                    pEnd = g.endNode.position
-                    x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-                    plt.plot(x, y, 'g')
 
-                #gammaSelected.append(vars[i])
+i = 0 
+k = 0
+plotting.plotBase()
+plotting.plotZetaArc(vars, i)
+plotting.plotGammaArc(vars, i, k)
+plotting.plotDeltaArc(vars, i, k)
+plotting.plotGammaArc(vars, i, 1)
+
+
+plotting.show()
+
+
+
+# pass
+
+
+
+# gammaSelected = []
+# zetaSelected = []
+# deltaSelected = []
+# gammaObj = []
+# for i in range(len(vars)):
+#     if vars[i].X == 1:
+        
+#         if "gammaSelect" in str(vars[i].VarName):
+            
+#                 key = Utils.getKeys(vars[i].VarName)
+#                 i = int(key[0])
+#                 k = int(key[1])
+#                 b = int(key[2])
+#                 c = int(key[3])
+#                 arc = gamma[i, k, b, c]
+#                 gammaSelected.append(arc)
+#                 g = gamma[i, k, b, c]
+#                 print(i,k,b,c)
+#                 if k==0 and i == 0:
+#                     pStart = g.startNode.position
+#                     pEnd = g.endNode.position
+#                     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+#                     plt.plot(x, y, 'r')
+#                 if k==1 and i == 0:
+#                     pStart = g.startNode.position
+#                     pEnd = g.endNode.position
+#                     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+#                     plt.plot(x, y, 'g')
+
+#                 #gammaSelected.append(vars[i])
             
                 
-        if "zetaSelect" in str(vars[i].VarName):
-            key = Utils.getKeys(vars[i].VarName)
-            i = int(key[0])
-            h = int(key[1])
-            b = int(key[2])
-            g = zeta[i, h, b]
+#         if "zetaSelect" in str(vars[i].VarName):
+#             key = Utils.getKeys(vars[i].VarName)
+#             i = int(key[0])
+#             h = int(key[1])
+#             b = int(key[2])
+#             g = zeta[i, h, b]
             
-            #print(i,k,b,c)
-            if i == 0:
-                pStart = g.startNode.position
-                pEnd = g.endNode.position
-                x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-                plt.plot(x, y, 'y')
+#             #print(i,k,b,c)
+#             if i == 0:
+#                 pStart = g.startNode.position
+#                 pEnd = g.endNode.position
+#                 x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+#                 plt.plot(x, y, 'y')
 
-        elif "deltaSelect" in str(vars[i].VarName):
-            key = Utils.getKeys(vars[i].VarName)
-            print(key)
-            i = int(key[0])
-            k = int(key[1])
-            b = int(key[2])
-            c = int(key[3])
-            g = delta[i, k, b, c]
+#         elif "deltaSelect" in str(vars[i].VarName):
+#             key = Utils.getKeys(vars[i].VarName)
+#             print(key)
+#             i = int(key[0])
+#             k = int(key[1])
+#             b = int(key[2])
+#             c = int(key[3])
+#             g = delta[i, k, b, c]
             
-            #print(i,k,b,c)
-            if i == 0 and k == 0:
-                pStart = g.startNode.position
-                pEnd = g.endNode.position
-                x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-                plt.plot(x, y, 'y--')
+#             #print(i,k,b,c)
+#             if i == 0 and k == 0:
+#                 pStart = g.startNode.position
+#                 pEnd = g.endNode.position
+#                 x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+#                 plt.plot(x, y, 'y--')
             
-            if i == 0 and k == 0:
-                pStart = g.startNode.position
-                pEnd = g.endNode.position
-                x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-                plt.plot(x, y, 'b--')
+#             if i == 0 and k == 0:
+#                 pStart = g.startNode.position
+#                 pEnd = g.endNode.position
+#                 x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+#                 plt.plot(x, y, 'b--')
 
-            deltaSelected.append(vars[i])
-
-
-
-# for k in range(num_k):
-#     for gammaArc in gammaSelected:
+#             deltaSelected.append(vars[i])
 
 
+
+# # for k in range(num_k):
+# #     for gammaArc in gammaSelected:
 
 
 
 
-#Plotting=========================================================0
-
-plt.xlim(0, 100)
-plt.ylim(0, 100)
-plt.grid()
-
-#plot source 
-sourcePosition = data["nodes"]["source"].position
-
-plt.plot(sourcePosition[0], sourcePosition[1], marker="+", markersize=10, markeredgecolor="red", markerfacecolor="green")
-# plot evaAreas
-
-for area in evaAreas:
-    position = area.position
-    #print(position)
-    plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="blue")
 
 
-for loc in initialLocations:
-    position = loc.position
-    plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="yellow", markerfacecolor="grey")
+# #Plotting=========================================================0
+
+# plt.xlim(0, 100)
+# plt.ylim(0, 100)
+# plt.grid()
+
+# #plot source 
+# sourcePosition = data["nodes"]["source"].position
+
+# plt.plot(sourcePosition[0], sourcePosition[1], marker="+", markersize=10, markeredgecolor="red", markerfacecolor="green")
+# # plot evaAreas
+
+# for area in evaAreas:
+#     position = area.position
+#     #print(position)
+#     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="blue")
 
 
-for pickUpPoint in pickUpPoints:
-    position = pickUpPoint.position
-    #print(position)
-    plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="yellow")
+# for loc in initialLocations:
+#     position = loc.position
+#     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="yellow", markerfacecolor="grey")
 
 
-for shelter in shelters:
-    position = shelter.position
-    #print(position)
-    plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="red")
+# for pickUpPoint in pickUpPoints:
+#     position = pickUpPoint.position
+#     #print(position)
+#     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="yellow")
 
 
-position = sink.position
-plt.plot(position[0], position[1], marker="+", markersize=10, markeredgecolor="green", markerfacecolor="red")
+# for shelter in shelters:
+#     position = shelter.position
+#     #print(position)
+#     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="red")
 
 
-### ARCS alfa ####
-for a in alfa:
-    pStart = alfa[a].startNode.position
-    pEnd = alfa[a].endNode.position
+# position = sink.position
+# plt.plot(position[0], position[1], marker="+", markersize=10, markeredgecolor="green", markerfacecolor="red")
 
 
-    x1, y1 = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-
-    plt.plot(x1, y1, 'k:')
-
-### ARCS beta ####
-
-for key in beta:
-        pStart = beta[key].startNode.position
-        pEnd = beta[key].endNode.position
-        x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-        plt.plot(x, y, 'k--')
-
-for key in epsilon:
-    pStart = epsilon[key].startNode.position
-    pEnd = epsilon[key].endNode.position
-    x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-    plt.plot(x, y, 'k:')
-
-# for a in lmbda:
-#     pStart = a.startNode.position
-#     pEnd = a.endNode.position
-#     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-#     plt.plot(x, y, 'k')
+# ### ARCS alfa ####
+# for a in alfa:
+#     pStart = alfa[a].startNode.position
+#     pEnd = alfa[a].endNode.position
 
 
+#     x1, y1 = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
 
-# for b in range(num_b):
-#     for c in range(num_c):
-#         g = gammaSelected[0][0][b][c]
-#         pStart = g.startNode.position
-#         pEnd = g.endNode.position
+#     plt.plot(x1, y1, 'k:')
+
+# ### ARCS beta ####
+
+# for key in beta:
+#         pStart = beta[key].startNode.position
+#         pEnd = beta[key].endNode.position
 #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-#         plt.plot(x, y, 'g')
-#         xm, ym = Utils.middle(pStart, pEnd)
-#         plt.text(xm -1 , ym, str(int(g.cost)))
+#         plt.plot(x, y, 'k--')
 
-plt.show()
+# for key in epsilon:
+#     pStart = epsilon[key].startNode.position
+#     pEnd = epsilon[key].endNode.position
+#     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+#     plt.plot(x, y, 'k:')
+
+# # for a in lmbda:
+# #     pStart = a.startNode.position
+# #     pEnd = a.endNode.position
+# #     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+# #     plt.plot(x, y, 'k')
+
+
+
+# # for b in range(num_b):
+# #     for c in range(num_c):
+# #         g = gammaSelected[0][0][b][c]
+# #         pStart = g.startNode.position
+# #         pEnd = g.endNode.position
+# #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
+# #         plt.plot(x, y, 'g')
+# #         xm, ym = Utils.middle(pStart, pEnd)
+# #         plt.text(xm -1 , ym, str(int(g.cost)))
+
+# plt.show()

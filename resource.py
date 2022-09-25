@@ -3,36 +3,28 @@ import random
 from utils import Utils
 
 class Resource:
-    def __init__(self, num_h):
+    def __init__(self, initialLocations):
         self.trip = 0
         self.speed = 0
         self.clas = 0
         self.fixedCost = int()
         self.varCost = int()
-        self.populate(num_h)
-        # self.capacity =             # q: Passenger capacity of resource i
-        # self.timeToAvaiability      # u: Time to availability of resource i
-        # self.loadingTime            # o: Loading time of resource i
-        # self.unloadingTime          # p: Unloading time of resource i
-        # self.emptySpeed             
-        # self.loadedSpeed
-        # self.type           # forse non serve, basta mettere timetoavaiability -1
-        #self.initialLocation
-
-    def populate(self, num_h):
+        self.populate(initialLocations)
+       
+    def populate(self, initialLocations):
 
         self.capacity = random.randint(10,25)
-        self.timeToAvaiability = random.randint(10, 30)
-        self.loadingTime = random.randint(5, 15)
-        self.fixedCost = 10000#random.randint(30, 50)
-        self.varCost =  random.randint(3, 5) # cost per unit time
-        #self.loadingTime = self.loadingTime + (self.capacity + self.loadingTime)/self.capacity
-        self.unloadingTime = random.randint(5, 15)
-        self.emptySpeed = 75
-        self.loadedSpeed = 40
-        #self.type = 1           #tipo dock, airport strips
-        self.maxTrips = 0     #da impostare settabile poi
-        self.initialLocation = random.randint(1, num_h )
+        self.timeToAvaiability = random.randint(10, 25)
+        self.loadingTime = random.randint(8, 15)
+        self.fixedCost = random.randint(50000, 100000)
+        self.varCost =  random.randint(60, 90) # cost per unit time
+        self.unloadingTime = random.randint(4, 8)
+        self.emptySpeed = 1                     #Km/min
+        self.loadedSpeed = 40/60                #Km/min
+        self.maxTrips = 0 
+        h = len(initialLocations)
+        index = random.randint(0, h-1 )
+        self.initialLocation = initialLocations[index]
 
     def setSpeed(self, coeff):
 
