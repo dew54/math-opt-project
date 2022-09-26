@@ -10,18 +10,18 @@ from utils import Utils
 import plotting
 
 
-num_i = 2
-num_a = 2
+num_i = 3
+num_a = 1
 num_b = 2
-num_c = 2
+num_c = 3
 num_h = 1
 num_selfEva = 5
 numClas = 1
 numScenarios = 1
-upperTimeLimit = 120 # 120 minutes
+upperTimeLimit = 320 #  minutes
 m = 0
-penalty = 5000
-evaDemand = [110, 120]
+penalty = 9000
+evaDemand = [110, 220]
 objFunction = {
     1 : 'bal_1',
     2 : 'bal_2',

@@ -48,10 +48,10 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
     min_k = math.ceil((sum(areas[a].evaDemand for a in range(num_a)))/(sum(resources[i].capacity for i in range(num_i))))
     max_k = math.floor((sum(areas[a].evaDemand for a in range(num_a))/(min(capacities))))
 
-    if(abs(min_k-max_k) <= 1):
-        num_k = min_k
-    else:
-        num_k = random.randint(min_k, max_k)
+    #if(abs(min_k-max_k) <= 1):
+    num_k = min_k
+    # else:
+        # num_k = random.randint(min_k, max_k)
 
     for resource in resources:
         resource.maxTrips = num_k

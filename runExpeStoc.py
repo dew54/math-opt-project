@@ -59,6 +59,7 @@ def runExpeStochastic(data, params):
     Z_i = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.BINARY, name="isResInFleet")
     N_a = S_ICEP.addVars([(s, a) for s in range(num_s) for a in range(num_a)], vtype=gb.GRB.INTEGER, name="numNotEva")
     r = S_ICEP.addVars( [(s) for s in range(num_s)], vtype=gb.GRB.INTEGER, name="totalTime")
+    #E_c = S_ICEP.addVar(vtype=gb.GRB.INTEGER, name="meanCost")
    
     # Eq. 2
     S_ICEP.addConstrs((S_i[s, i]<=r[s] for s in range(num_s) for i in range(num_i)), name="Eq-2")
@@ -171,8 +172,8 @@ def runExpeStochastic(data, params):
     o = 0
     firstObj = dict()
     bal = (((gb.quicksum(resources[s][i].fixedCost * Z_i[i] for i in range(num_i)))/(sum(resources[s][i].fixedCost + 
-        resources[s][i].getVarCost(T) for i in range(num_i))))) + ((gb.quicksum(scenarios[s].probability * 
-        (r[s] + fraction[s]) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))) for s in range(num_s))))
+         resources[s][i].getVarCost(T) for i in range(num_i))))) # + ((gb.quicksum(scenarios[s].probability * 
+        # (r[s] + fraction[s]) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))) for s in range(num_s))))
 
     econ = (resources[s][i].fixedCost * Z_i[i] for i in range(num_i))
     firstObj['bal_1'] = bal
@@ -181,18 +182,18 @@ def runExpeStochastic(data, params):
     firstObj['cons_2'] = 0
     firstObj['econ_1'] = econ
     firstObj['econ_2'] = econ
-    #S_ICEP.setObjectiveN(firstObj[objFunction], o, 1)
     if 'cons' not in objFunction:
         o+=1
-    
 
+    secondObj = []    
     
-    for s in range(num_s ):
+    for s in range(num_s):
         obj = dict()
         
-        bal_1 = r[s] + fraction[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) )))
-        bal_2 = gb.quicksum(S_i[s,i] for i in range(num_i)) + fraction[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) )))
+        bal_1 = scenarios[s].probability*(r[s] + fraction[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
+        bal_2 = scenarios[s].probability*(gb.quicksum(S_i[s,i] for i in range(num_i)) + fraction[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
         
+
         cons_1 = scenarios[s].probability* (r[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
         cons_2 = scenarios[s].probability* (gb.quicksum(S_i[s,i] for i in range(num_i)) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
 
@@ -206,21 +207,25 @@ def runExpeStochastic(data, params):
         obj['econ_1'] = econ_1
         obj['econ_2'] = econ_2
 
+
         obj2 = obj[objFunction]
+        secondObj.append(obj2) 
+        
         #S_ICEP.setObjectiveN(obj2, o, 1)
         o+=1
 
+        #
+    S_ICEP.setObjective(firstObj[objFunction] + gb.quicksum(secondObj[s] for s in range(num_s)))       # Set first obj
 
-        bal += bal_1
-    #
 
-    S_ICEP.setObjective(bal)
-    S_ICEP.tune()
-    #S_ICEP.optimize()
+    #S_ICEP.setObjective(bal)
+    #S_ICEP.tune()
+    S_ICEP.write("mymodel.lp")
+    S_ICEP.optimize()
 
     if S_ICEP.status == 2:
         S_ICEP.write("solution.sol")
-        S_ICEP.write("mymodel.lp")
+        
         return S_ICEP.status, S_ICEP.Runtime, S_ICEP.ObjVal, S_ICEP
     else:
         print("--------Gurobi did not find a optiml solution-----------")

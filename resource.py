@@ -13,7 +13,7 @@ class Resource:
        
     def populate(self, initialLocations):
 
-        self.capacity = random.randint(10,25)
+        self.capacity = random.randint(20,25)
         self.timeToAvaiability = random.randint(10, 25)
         self.loadingTime = random.randint(8, 15)
         self.fixedCost = random.randint(50000, 100000)

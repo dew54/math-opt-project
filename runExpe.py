@@ -164,6 +164,8 @@ def runExpe(data):
 
 
     D_ICEP.optimize()  # equivalent to solve() for xpress
+    D_ICEP.write("mymodel.lp")
+
 
 
 
@@ -174,7 +176,6 @@ def runExpe(data):
 
     if D_ICEP.status == 2:
         D_ICEP.write("solution.sol")
-        D_ICEP.write("mymodel.lp")
         return D_ICEP.status, D_ICEP.Runtime, D_ICEP.ObjVal, D_ICEP
         #print("-----------------", X_i_k_bc.values(), "-----------------")
 

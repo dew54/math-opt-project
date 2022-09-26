@@ -98,7 +98,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
         
         scenarios[s].num_k = min_k 
         
-        num_k = min_k 
+        num_k = 10 
         
 
 
