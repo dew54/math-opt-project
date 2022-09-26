@@ -121,16 +121,16 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
     for s  in range(numScenarios):
         for i in range(num_i):
             resource = resources[s][i]
-            for k in range(scenarios[s].num_k):
-                resource.trip = k
-                for a_i in range(num_a):
-                    startNode = areas[a_i]
-                    for b_i in range(num_b):
-                        endNode = pickUpPoints[b_i]
-                        arc = Arc(startNode, endNode, 0, "beta")
-                        arc.trip = k
-                        keys = s, i, k, a_i, b_i
-                        beta[keys] = arc
+        for k in range(scenarios[s].num_k):
+            
+            for a_i in range(num_a):
+                startNode = areas[a_i]
+                for b_i in range(num_b):
+                    endNode = pickUpPoints[b_i]
+                    arc = Arc(startNode, endNode, 0, "beta")
+                    arc.trip = k
+                    keys = s, k, a_i, b_i
+                    beta[keys] = arc
 
 
     for s in range(numScenarios):

@@ -3,14 +3,14 @@ import plotting
 import runExpe
 
 
-num_i = 3               # Number of potential resources for evacuation purpouses
+num_i = 6               # Number of potential resources for evacuation purpouses
 num_a = 3               # Number of areas to be evacuated
 num_b = 3               # Number of pickUp points where people are loaded on rescue vehicles
-num_c = 2               # Number of shelters where people is dropped off
+num_c = 3               # Number of shelters where people is dropped off
 num_h = 2               # Number of initial locations from where rescue resources depart
 num_t = 1               # Number of sink node (to not be changed)
-evaDemand = 100          # Number of people per area
-num_selfEva = 5         # Number of self evacuees (people that can safe themselfs)
+evaDemand = 600          # Number of people per area
+num_selfEva = 20        # Number of self evacuees (people that can safe themselfs)
 numClas = 2             # Number of classes of rescue resources
 
 data = generateSimpleData.generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)

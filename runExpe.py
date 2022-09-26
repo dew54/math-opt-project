@@ -44,121 +44,6 @@ def runExpe(data):
 
 
 
-    # ================ Plotting ================
-    # plt.xlim(0, 100)
-    # plt.ylim(0, 100)
-    # plt.grid()
-
-    # #plot source 
-    # sourcePosition = data["nodes"]["source"].position
-
-    # plt.plot(sourcePosition[0], sourcePosition[1], marker="+", markersize=10, markeredgecolor="red", markerfacecolor="green")
-    # # plot evaArea
-
-    
-
-
-
-    # for area in evaAreas:
-    #     position = area.position
-    #     #print(position)
-    #     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="blue")
-
-    
-    # for loc in initialLocations:
-    #     position = loc.position
-    #     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="yellow", markerfacecolor="grey")
-    
-    
-    # for pickUpPoint in pickUpPoints:
-    #     position = pickUpPoint.position
-    #     #print(position)
-    #     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="yellow")
-
-    
-    # for shelter in shelters:
-    #     position = shelter.position
-    #     #print(position)
-    #     plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="red")
-
-    
-    # position = sink.position
-    # plt.plot(position[0], position[1], marker="+", markersize=10, markeredgecolor="green", markerfacecolor="red")
-
-    # ### ARCS alfa ####
-    # for a in alfa:
-    #     pStart = a.startNode.position
-    #     pEnd = a.endNode.position
-
-
-    #     x1, y1 = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-
-    #     plt.plot(x1, y1, 'r:')
-
-    # ### ARCS beta ####
-    # for a in range(num_a):    
-    #     for b in beta[0][0][a]:
-    #         pStart = b.startNode.position
-    #         pEnd = b.endNode.position
-    #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-            
-    #         plt.plot(x, y, 'b')
-    #         xm, ym = Utils.middle(pStart, pEnd)
-    #         plt.text(xm, ym, str(b.cost), color="blue")
-
-    # for b in range(num_b):
-    #     for g in gamma[0][0][b]:
-    #         pStart = g.startNode.position
-    #         pEnd = g.endNode.position
-    #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-    #         plt.plot(x, y, 'g')
-    #         xm, ym = Utils.middle(pStart, pEnd)
-    #         plt.text(xm -1 , ym, str(int(g.cost)))
-
-    # for c in range(num_c):
-    #     for a in delta[0][0][c]:
-    #         pStart = a.startNode.position
-    #         pEnd = a.endNode.position
-    #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-    #         plt.plot(x, y, 'm--')
-    #         xm, ym = Utils.middle(pStart, pEnd)
-    #         plt.text(xm + 1, ym, str(int(a.cost)))
-
-    # for a in epsilon:
-    #     pStart = a.startNode.position
-    #     pEnd = a.endNode.position
-    #     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-    #     plt.plot(x, y, 'k:')
-    #     # xm, ym = Utils.middle(pStart, pEnd)
-    #     # plt.text(xm, ym, str(a.cost))
-
-    # for h in range(num_h):
-    #     for a in zeta[0][h]:
-    #         pStart = a.startNode.position
-    #         pEnd = a.endNode.position
-    #         x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-    #         plt.plot(x, y, 'c--')
-    #         xm, ym = Utils.middle(pStart, pEnd)
-    #         plt.text(xm, ym, str(a.cost), color="cyan")
-
-    # for a in lmbda:
-    #     pStart = a.startNode.position
-    #     pEnd = a.endNode.position
-    #     print(a.flow)
-
-    #     x, y = [pStart[0], pEnd[0]], [pStart[1], pEnd[1]]
-    #     plt.plot(x, y, 'y')
-    #     xm, ym = Utils.middle(pStart, pEnd)
-    #     plt.text(xm, ym, str(a.cost))
-
-
-   
-        
-    
-
-    # ================ End Plotting ================
-
-
     D_ICEP = gb.Model("icep")
     #D_ICEP.Params.LogToConsole = 0  # suppress the log of the model
     D_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
@@ -174,15 +59,7 @@ def runExpe(data):
     Y_i_k_cb = D_ICEP.addVars([(i, k, c, b) for i in range(num_i) for k in range(num_k) for c in range(num_c) for b in range(num_b) ], vtype=gb.GRB.BINARY, name="deltaSelect")
     S_i = D_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="timeForResourceI")
     r = D_ICEP.addVar(vtype=gb.GRB.INTEGER, name="totalTime")
-    #print(gamma[0][0][0])
-
-    #plt.show()
-    #plt.pause(0.001)
-    # return
-
-    # ## COnstraints
-    #with suppress(Exception):   
-
+    
     # Eq. 2
     D_ICEP.addConstrs((S_i[i]<=r for i in range(num_i)), name="Eq-2")
 

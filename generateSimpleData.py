@@ -11,13 +11,20 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
     
     resources = []
     capacities = []
+
+    initialLocations = []
+    for index in range(num_h):
+        position = [random.randint(10, 15), random.randint(1, 99) ]
+        initialLocation = Node(position, "initial", index)
+        initialLocations.append(initialLocation)
     
     for index in range(num_i):
-        resource = Resource(num_h)
+        resource = Resource(initialLocations)
         if(index < numClas):
             resource.clas = index
         else:
             resource.clas = 0
+        
         resources.append(resource)
         
         capacities.append(resource.capacity)
@@ -50,11 +57,7 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
         resource.maxTrips = num_k
 
         
-    initialLocations = []
-    for index in range(num_h):
-        position = [random.randint(10, 15), random.randint(1, 99) ]
-        initialLocation = Node(position, "initial", index)
-        initialLocations.append(initialLocation)
+    
     
     pickUpPoints = []
     for index in range(num_b):

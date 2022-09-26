@@ -27,12 +27,8 @@ def runExpeStochastic(data, params):
     num_c = data['params']['c']
     num_h = data['params']['h']
     num_t = 1
-    #scenarios[s].num_k = data['params']['k']
     num_selfEva = data['params']['self'] 
-    #evaDemand = data['params']['demand'] 
     num_s = data['params']['s']
-
-
 
     evaAreas = data["nodes"]["area"]
     initialLocations = data["nodes"]['initial']
@@ -53,19 +49,16 @@ def runExpeStochastic(data, params):
     #D_ICEP.Params.LogToConsole = 0  # suppress the log of the model
     S_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
     FL_a_t = S_ICEP.addVars([(s, a, t) for (s, a, t) in lmbda.keys()], vtype=gb.GRB.CONTINUOUS, name="flowLmbda")
-    FL_i_k_ab = S_ICEP.addVars([(s, i, k, a, b) for (s, i, k, a, b) in beta.keys() ], vtype=gb.GRB.CONTINUOUS, name="flowBeta")
+    FL_i_k_ab = S_ICEP.addVars([(s, k, a, b) for (s, k, a, b) in beta.keys() ], vtype=gb.GRB.CONTINUOUS, name="flowBeta")
     FL_i_k_bc = S_ICEP.addVars([(s, i, k, b, c) for (s, i, k, b, c) in gamma.keys() ], vtype=gb.GRB.CONTINUOUS, name="flowGamma")
-    FL_i_k_ct = S_ICEP.addVars([(s, i, k, c, t) for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(num_t) ], vtype=gb.GRB.CONTINUOUS, name="flowEpsilon")
+    FL_i_k_ct = S_ICEP.addVars([(s, k, c, t) for s in range(num_s) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(num_t) ], vtype=gb.GRB.CONTINUOUS, name="flowEpsilon")
     W_i_1_hb = S_ICEP.addVars([(s, i, h, b) for (s, i, h, b) in zeta.keys() ], vtype=gb.GRB.BINARY, name="zetaSelect")
     X_i_k_bc = S_ICEP.addVars([(s, i, k, b, c) for (s, i, k, b, c) in gamma.keys()], vtype=gb.GRB.BINARY, name="gammaSelect")
     Y_i_k_cb = S_ICEP.addVars([(s, i, k, c, b) for (s, i, k, c, b) in delta.keys() ], vtype=gb.GRB.BINARY, name="deltaSelect")
     S_i = S_ICEP.addVars([(s, i) for s in range(num_s) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="timeForResourceI")
     Z_i = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.BINARY, name="isResInFleet")
     N_a = S_ICEP.addVars([(s, a) for s in range(num_s) for a in range(num_a)], vtype=gb.GRB.INTEGER, name="numNotEva")
-    E_c = S_ICEP.addVar(vtype=gb.GRB.CONTINUOUS, name="meanCost")
-    C_z_xi = S_ICEP.addVars([(s) for s in range(num_s)], vtype=gb.GRB.CONTINUOUS,name="C_zxi")
     r = S_ICEP.addVars( [(s) for s in range(num_s)], vtype=gb.GRB.INTEGER, name="totalTime")
-
    
     # Eq. 2
     S_ICEP.addConstrs((S_i[s, i]<=r[s] for s in range(num_s) for i in range(num_i)), name="Eq-2")
@@ -97,7 +90,7 @@ def runExpeStochastic(data, params):
     S_ICEP.addConstrs((FL_i_k_bc[s, i, k, b, c] <= resources[s][i].capacity * X_i_k_bc[s, i, k, b, c] for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c) ), name="Eq-5")
 
     # Eq. 7
-    S_ICEP.addConstrs((gb.quicksum( FL_i_k_ab[s, i, k, a, b] for a in range(num_a)  ) 
+    S_ICEP.addConstrs((gb.quicksum( FL_i_k_ab[s, k, a, b] for a in range(num_a)  ) 
         ==
             gb.quicksum( FL_i_k_bc[s, i, k, b, c] for c in range(num_c) ) 
             
@@ -107,7 +100,7 @@ def runExpeStochastic(data, params):
     # Eq. 8
     S_ICEP.addConstrs(((gb.quicksum(FL_i_k_bc[s, i, k, b, c]  for b in range(num_b) )
         ==
-            FL_i_k_ct[s, i, k, c, t] )
+            FL_i_k_ct[s, k, c, t] )
             
             for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(num_t)), name="Eq-8")
  
@@ -124,13 +117,13 @@ def runExpeStochastic(data, params):
     S_ICEP.addConstrs((FL_a_t[s, a, t] >= 0 for s in range(num_s) for a in range(num_a) for t in range(num_t)), name="Eq-15")
 
     # Eq 16 
-    S_ICEP.addConstrs((FL_i_k_ab[s, i, k, a, b] >= 0 for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for a in range(num_a) for b in range(num_b)), name="Eq-16")
+    S_ICEP.addConstrs((FL_i_k_ab[s, k, a, b] >= 0 for s in range(num_s) for k in range(scenarios[s].num_k) for a in range(num_a) for b in range(num_b)), name="Eq-16")
 
     # Eq. 17
     S_ICEP.addConstrs((FL_i_k_bc[s, i, k, b, c] >= 0 for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c)), name="Eq-17")
 
     # Eq. 18
-    S_ICEP.addConstrs((FL_i_k_ct[s, i, k, c, t] >= 0 for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(num_t)), name="Eq-18")
+    S_ICEP.addConstrs((FL_i_k_ct[s, k, c, t] >= 0 for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(num_t)), name="Eq-18")
 
     # Eq. 19
     S_ICEP.addConstrs((S_i[s, i] >= 0 for s in range(num_s) for i in range(num_i)), name="Eq-19")
@@ -149,7 +142,7 @@ def runExpeStochastic(data, params):
     S_ICEP.addConstrs((FL_i_k_bc[s, i, k, b, c] <= resources[s][i].capacity*Z_i[i] for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c)), name="Eq-30")
     
     # Eq. 31
-    S_ICEP.addConstrs((scenarios[s].evaAreas[a].evaDemand == FL_a_t[s, a, 0] + gb.quicksum(FL_i_k_ab[s, i, k, a, b] for i in range(num_i) for k in range(scenarios[s].num_k)  for b in range(num_b)) + N_a[s, a]  for s in range(num_s) for a in range(num_a)), name="Eq-31" )
+    S_ICEP.addConstrs((scenarios[s].evaAreas[a].evaDemand == FL_a_t[s, a, 0] + gb.quicksum(FL_i_k_ab[s, k, a, b] for k in range(scenarios[s].num_k)  for b in range(num_b)) + N_a[s, a]  for s in range(num_s) for a in range(num_a)), name="Eq-31" )
 
     # Eq. 32
     S_ICEP.addConstrs((gb.quicksum( W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) <= Z_i[i] for s in range(num_s) for i in range(num_i)), name="Eq-32")
@@ -168,24 +161,19 @@ def runExpeStochastic(data, params):
     for s in range(num_s):
         fraction.append( (gb.quicksum(resources[s][i].getVarCost(S_i[s, i]) for i in range(num_i))) / (sum(resources[s][i].fixedCost + resources[s][i].getVarCost(T) for i in range(num_i))) )
     
-    S_ICEP.addConstrs((C_z_xi[s] == (r[s] + fraction[s]) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) )))for s in range(num_s) ), name="Aux-Eq.")
-
-    S_ICEP.addConstr(E_c == (gb.quicksum(scenarios[s].probability * C_z_xi[s] for s in range(num_s))))
-
-    
     # Problem extensions
 
     # Eq. for forcing m percent of population to be saved
     if params['force_eva_percent']:
         S_ICEP.addConstrs((1-m) * sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a)) >= gb.quicksum(N_a[s, a]  for a in range(num_a)) for s in range(num_s))
 
-    
-    
     # Set up objective functions
-
     o = 0
     firstObj = dict()
-    bal = (((gb.quicksum(resources[s][i].fixedCost * Z_i[i] for i in range(num_i)))/(sum(resources[s][i].fixedCost + resources[s][i].getVarCost(T) for i in range(num_i))))) + (E_c)
+    bal = (((gb.quicksum(resources[s][i].fixedCost * Z_i[i] for i in range(num_i)))/(sum(resources[s][i].fixedCost + 
+        resources[s][i].getVarCost(T) for i in range(num_i))))) + ((gb.quicksum(scenarios[s].probability * 
+        (r[s] + fraction[s]) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))) for s in range(num_s))))
+
     econ = (resources[s][i].fixedCost * Z_i[i] for i in range(num_i))
     firstObj['bal_1'] = bal
     firstObj['bal_2'] = bal
@@ -221,10 +209,10 @@ def runExpeStochastic(data, params):
         obj2 = obj[objFunction]
         S_ICEP.setObjectiveN(obj2, o, 1)
         o+=1
+    S_ICEP.tune()
 
 
-
-    S_ICEP.optimize()
+    #S_ICEP.optimize()
 
     if S_ICEP.status == 2:
         S_ICEP.write("solution.sol")
