@@ -48,10 +48,10 @@ def runExpeStochastic(data, params):
     S_ICEP = gb.Model("s-icep")
     #D_ICEP.Params.LogToConsole = 0  # suppress the log of the model
     S_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
-    FL_a_t = S_ICEP.addVars([(s, a, t) for (s, a, t) in lmbda.keys()], vtype=gb.GRB.CONTINUOUS, name="flowLmbda")
-    FL_i_k_ab = S_ICEP.addVars([(s, k, a, b) for (s, k, a, b) in beta.keys() ], vtype=gb.GRB.CONTINUOUS, name="flowBeta")
-    FL_i_k_bc = S_ICEP.addVars([(s, i, k, b, c) for (s, i, k, b, c) in gamma.keys() ], vtype=gb.GRB.CONTINUOUS, name="flowGamma")
-    FL_i_k_ct = S_ICEP.addVars([(s, k, c, t) for s in range(num_s) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(num_t) ], vtype=gb.GRB.CONTINUOUS, name="flowEpsilon")
+    FL_a_t = S_ICEP.addVars([(s, a, t) for (s, a, t) in lmbda.keys()], vtype=gb.GRB.INTEGER, name="flowLmbda")
+    FL_i_k_ab = S_ICEP.addVars([(s, k, a, b) for (s, k, a, b) in beta.keys() ], vtype=gb.GRB.INTEGER, name="flowBeta")
+    FL_i_k_bc = S_ICEP.addVars([(s, i, k, b, c) for (s, i, k, b, c) in gamma.keys() ], vtype=gb.GRB.INTEGER, name="flowGamma")
+    FL_i_k_ct = S_ICEP.addVars([(s, k, c, t) for s in range(num_s) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(num_t) ], vtype=gb.GRB.INTEGER, name="flowEpsilon")
     W_i_1_hb = S_ICEP.addVars([(s, i, h, b) for (s, i, h, b) in zeta.keys() ], vtype=gb.GRB.BINARY, name="zetaSelect")
     X_i_k_bc = S_ICEP.addVars([(s, i, k, b, c) for (s, i, k, b, c) in gamma.keys()], vtype=gb.GRB.BINARY, name="gammaSelect")
     Y_i_k_cb = S_ICEP.addVars([(s, i, k, c, b) for (s, i, k, c, b) in delta.keys() ], vtype=gb.GRB.BINARY, name="deltaSelect")
@@ -181,7 +181,7 @@ def runExpeStochastic(data, params):
     firstObj['cons_2'] = 0
     firstObj['econ_1'] = econ
     firstObj['econ_2'] = econ
-    S_ICEP.setObjectiveN(firstObj[objFunction], o, 1)
+    #S_ICEP.setObjectiveN(firstObj[objFunction], o, 1)
     if 'cons' not in objFunction:
         o+=1
     
@@ -207,11 +207,15 @@ def runExpeStochastic(data, params):
         obj['econ_2'] = econ_2
 
         obj2 = obj[objFunction]
-        S_ICEP.setObjectiveN(obj2, o, 1)
+        #S_ICEP.setObjectiveN(obj2, o, 1)
         o+=1
+
+
+        bal += bal_1
+    #
+
+    S_ICEP.setObjective(bal)
     S_ICEP.tune()
-
-
     #S_ICEP.optimize()
 
     if S_ICEP.status == 2:

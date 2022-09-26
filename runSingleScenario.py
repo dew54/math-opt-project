@@ -1,5 +1,4 @@
 import statistics
-
 #from re import T
 from unicodedata import name
 from matplotlib import pyplot as plt
@@ -15,7 +14,7 @@ from generateData import generateData
 from utils import Utils
 
 
-def runExpe(data):
+def runExpe(data, D_ICEP, s, Z, coeff):
     num_i = data['params']['i']#3
     num_a = data['params']['a']
     num_b = data['params']['b']
@@ -25,6 +24,9 @@ def runExpe(data):
     num_k = data['params']['k']
     num_selfEva = data['params']['self'] 
     evaDemand = data['params']['demand'] 
+    T = 200
+    P = 1000
+    coeff = 1.2
 
 
 
@@ -44,9 +46,9 @@ def runExpe(data):
 
 
 
-    D_ICEP = gb.Model("icep")
+    #D_ICEP = D_ICEP#gb.Model("icep" +str(s+1))
     #D_ICEP.Params.LogToConsole = 0  # suppress the log of the model
-    D_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
+    #D_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
 
 
     
@@ -58,16 +60,12 @@ def runExpe(data):
     X_i_k_bc = D_ICEP.addVars([(i, k, b, c) for i in range(num_i) for k in range(num_k) for b in range(num_b)  for c in range(num_c)], vtype=gb.GRB.BINARY, name="gammaSelect")
     Y_i_k_cb = D_ICEP.addVars([(i, k, c, b) for i in range(num_i) for k in range(num_k) for c in range(num_c) for b in range(num_b) ], vtype=gb.GRB.BINARY, name="deltaSelect")
     S_i = D_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="timeForResourceI")
+    Z_i = Z# [var for var in D_ICEP.getVars() if "isResInFleet" in var.VarName]   
+    # E_c = [var for var in D_ICEP.getVars() if "meanCost" in var.VarName]
+    N_a = D_ICEP.addVars([(a) for a in range(num_a)], vtype=gb.GRB.INTEGER, name="numNotEva")
+
     r = D_ICEP.addVar(vtype=gb.GRB.INTEGER, name="totalTime")
-    #print(gamma[0][0][0])
-
-    #plt.show()
-    #plt.pause(0.001)
-    # return
-
-    # ## COnstraints
-    #with suppress(Exception):   
-
+    
     # Eq. 2
     D_ICEP.addConstrs((S_i[i]<=r for i in range(num_i)), name="Eq-2")
 
@@ -75,11 +73,11 @@ def runExpe(data):
     # for i in range(num_i-1): 
         
     # Eq. 3
-    D_ICEP.addConstrs(((gb.quicksum( zeta[i, h, b].cost * W_i_1_hb[i, h, b]  for (i, h, b) in zeta.keys()) #for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta ) 
+    D_ICEP.addConstrs(((gb.quicksum( zeta[i, h, b].cost * coeff * W_i_1_hb[i, h, b]  for (i, h, b) in zeta.keys()) #for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta ) 
         + 
-            gb.quicksum(gamma[i, k, b, c].cost * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) #for k in range(num_k) for b in range(num_b) for c in range(num_c) if(i, k, b, c) in gamma)
+            gb.quicksum(gamma[i, k, b, c].cost * coeff * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) #for k in range(num_k) for b in range(num_b) for c in range(num_c) if(i, k, b, c) in gamma)
         +
-            gb.quicksum(delta[i, k, c, b].cost * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys()) #for k in range(num_k) for c in range(num_c) for b in range(num_b) if (i, k, c, b) in delta)
+            gb.quicksum(delta[i, k, c, b].cost * coeff * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys()) #for k in range(num_k) for c in range(num_c) for b in range(num_b) if (i, k, c, b) in delta)
         +
             gb.quicksum(resources[i].timeToAvaiability * W_i_1_hb[i, h, b] for(i, h, b) in zeta.keys())  #for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta) 
         +
@@ -156,31 +154,67 @@ def runExpe(data):
     D_ICEP.addConstrs(W_i_1_hb[i, h, b] <= zeta[i, h, b].isLegit() for (i, h, b) in zeta)
     D_ICEP.addConstrs(X_i_k_bc[i, k, b, c] <= gamma[i, k, b, c].isLegit() for (i, k, b, c) in gamma)
     D_ICEP.addConstrs(Y_i_k_cb[i, k, c, b] <= delta[i, k, c, b].isLegit() for (i, k, c, b) in delta)
+    D_ICEP.addConstrs(W_i_1_hb[i, h, b] <= zeta[i, h, b].isInitialLocValid() for (i, h, b) in zeta)
 
+    # Eq. 30
+    D_ICEP.addConstrs((FL_i_k_bc[i, k, b, c] <= 
+        resources[i].capacity*
+        Z_i[i]  for i in range(num_i) for k in range(num_k) for b in range(num_b) for c in range(num_c)), name="Eq-30")
+    
+    # Eq. 31
+    D_ICEP.addConstrs((evaAreas[a].evaDemand == FL_a_t[a, 0] + gb.quicksum(FL_i_k_ab[i, k, a, b] 
+        for i in range(num_i) for k in range(num_k)  for b in range(num_b)) + N_a[a]   for a in range(num_a)), name="Eq-31" )
+
+    # Eq. 32
+    D_ICEP.addConstrs((gb.quicksum( W_i_1_hb[i, h, b] for h in range(num_h) for b in range(num_b)) <= Z_i[i]  for i in range(num_i)), name="Eq-32")
+
+    # Eq. 33
+    D_ICEP.addConstrs((gb.quicksum( X_i_k_bc[i, k, b, c] for b in range(num_b) for c in range(num_c)) <= Z_i[i]  for i in range(num_i) for k in range(num_k)), name="Eq-33")
+
+    # Eq. 34
+    D_ICEP.addConstrs((gb.quicksum(Y_i_k_cb[i, k, c, b] for c in range(num_c) for b in range(num_b)) <= Z_i[i]  for i in range(num_i) for k in range(num_k) if k!=num_k-1 ), name="Eq-34")
+
+    # Eq. 35
+    D_ICEP.addConstrs(((N_a[a] >= 0 ) for a in range(num_a)), name="Eq-35")
+
+    # D_ICEP.addConstr(E_c =  )
+
+
+
+        
+
+    fraction = gb.quicksum( (resources[i].getVarCost(S_i[i])/resources[i].fixedCost + resources[i].getVarCost(T))  for i in range(num_i))
+
+
+    # bal = ((gb.quicksum(resources[i].fixedCost * Z_i[i] for i in range(num_i)))/
+    #     (sum(resources[i].fixedCost + resources[i].getVarCost(T) for i in range(num_i))))
+         
+    obj = ( r + fraction + P*(gb.quicksum(N_a[a] for a in range(num_a) )))
+            
+            
 
 
     # Objective
-    D_ICEP.setObjective(r)
+    #D_ICEP.setObjectiveN(bal, 0, 1)
+    D_ICEP.setObjectiveN(obj, s+1, 2, 1)
+
+    return D_ICEP, obj
+        
 
 
-    D_ICEP.optimize()  # equivalent to solve() for xpress
+    #D_ICEP.optimize() 
 
 
 
-  #
-            #print(v.)
+    # if D_ICEP.status == 2:
+    #     D_ICEP.write("solution.sol")
+    #     D_ICEP.write("mymodel.lp")
+    #     return D_ICEP.status, D_ICEP.Runtime, D_ICEP.ObjVal, D_ICEP
+    #     #print("-----------------", X_i_k_bc.values(), "-----------------")
 
-
-
-    if D_ICEP.status == 2:
-        D_ICEP.write("solution.sol")
-        D_ICEP.write("mymodel.lp")
-        return D_ICEP.status, D_ICEP.Runtime, D_ICEP.ObjVal, D_ICEP
-        #print("-----------------", X_i_k_bc.values(), "-----------------")
-
-    else:
-        print("--------Gurobi did not find a optiml solution-----------")
-        return D_ICEP.status, D_ICEP.Runtime, None, None
+    # else:
+    #     print("--------Gurobi did not find a optiml solution-----------")
+    #     return D_ICEP.status, D_ICEP.Runtime, None, D_ICEP
 
 
 
