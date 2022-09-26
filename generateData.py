@@ -11,7 +11,6 @@ from numpy import random as nprandom
 
 
 def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  numClas, numScenarios):
-    random.seed(1)
 
 
     # Start node generation

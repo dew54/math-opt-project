@@ -15,7 +15,8 @@ from generateData import generateData
 from utils import Utils
 
 
-def runExpe(data):
+def runExpe(data, timeLimit = -1):
+    
     num_i = data['params']['i']#3
     num_a = data['params']['a']
     num_b = data['params']['b']
@@ -47,6 +48,8 @@ def runExpe(data):
     D_ICEP = gb.Model("icep")
     #D_ICEP.Params.LogToConsole = 0  # suppress the log of the model
     D_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
+    if timeLimit !=0:
+        D_ICEP.setParam("TimeLimit", timeLimit)
 
 
     

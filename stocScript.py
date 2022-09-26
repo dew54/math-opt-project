@@ -11,13 +11,13 @@ import plotting
 
 
 num_i = 3
-num_a = 1
+num_a = 2
 num_b = 2
 num_c = 3
 num_h = 1
 num_selfEva = 5
 numClas = 1
-numScenarios = 1
+numScenarios = 2
 upperTimeLimit = 320 #  minutes
 m = 0
 penalty = 9000
@@ -45,7 +45,7 @@ else:
 
 data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
 
-status, runtime, objVal, experiment = runExpeStoc.runExpeStochastic(data, params)
+status, runtime, objVal, experiment = runExpeStoc.runExpeStochastic(data, params, 10)
 
 
 # print("time for solving: ", runtime)
@@ -72,7 +72,6 @@ def runAndWrite(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numCl
     nuClas = list(range(1, numClas+1))
     nuScenarios = list(range(1, numScenarios+1))
     upperTimeLimit = 120 # 120 minutes
-    print("ciaooo")
 
     # data = generateData.generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
     # status, runtime, objVal, experiment = runExpeStoc.runExpeStochastic(data, params)

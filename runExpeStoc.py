@@ -15,7 +15,7 @@ from generateData import generateData
 from utils import Utils
 
 
-def runExpeStochastic(data, params):
+def runExpeStochastic(data, params, timeLimit = -1):
 
     T = params['upperTimeLimit']
     P = params['penalty']  
@@ -46,6 +46,8 @@ def runExpeStochastic(data, params):
     scenarios = data["scenarios"]
 
     S_ICEP = gb.Model("s-icep")
+    if timeLimit !=0:
+        S_ICEP.setParam("TimeLimit", timeLimit)
     #D_ICEP.Params.LogToConsole = 0  # suppress the log of the model
     S_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
     FL_a_t = S_ICEP.addVars([(s, a, t) for (s, a, t) in lmbda.keys()], vtype=gb.GRB.INTEGER, name="flowLmbda")
