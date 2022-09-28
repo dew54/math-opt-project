@@ -96,10 +96,10 @@ def runExpe(data, timeLimit = -1):
             S_i[i]) for i in range(num_i)) , name="Eq-3")
 
     # Eq. 4
-    D_ICEP.addConstrs((FL_a_t[a, t] <= lmbda[a, t].flow  for (a, t) in lmbda.keys())) #for a in range(num_a) if(a, 0) in lmbda ) ,name="Eq-4" )
+    D_ICEP.addConstrs((FL_a_t[a, t] <= lmbda[a, t].flow  for (a, t) in lmbda.keys()), name ='Eq-4') #for a in range(num_a) if(a, 0) in lmbda ) ,name="Eq-4" )
     
     # Eq. 5
-    D_ICEP.addConstrs((FL_i_k_bc[i, k, b, c] <= resources[i].capacity * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()))# for i in range(num_i) for k in range(num_k) for b in range(num_b) for c in range(num_c) if (i, k, c, b) in delta ), name="Eq-5")
+    D_ICEP.addConstrs((FL_i_k_bc[i, k, b, c] <= resources[i].capacity * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()), name ='Eq-5')# for i in range(num_i) for k in range(num_k) for b in range(num_b) for c in range(num_c) if (i, k, c, b) in delta ), name="Eq-5")
 
     # Eq. 6
     D_ICEP.addConstrs((evaAreas[a].evaDemand ==  FL_a_t[a, t] + gb.quicksum(FL_i_k_ab[i, k, a, b] for i in range(num_i) for k in range(num_k)  for b in range(num_b)  ) for a in range(num_a) for t in range(num_t)), name="Eq-6")
@@ -115,9 +115,9 @@ def runExpe(data, timeLimit = -1):
     # Eq. 8
     D_ICEP.addConstrs(((gb.quicksum(FL_i_k_bc[i, k, b, c]  for b in range(num_b) )
         ==
-            FL_i_k_ct[i, k, c, t] )
+            FL_i_k_ct[i, k, c, 0] )
             
-            for i in range(num_i) for k in range(num_k) for c in range(num_c) for t in range(num_t)), name="Eq-8")
+            for i in range(num_i) for k in range(num_k) for c in range(num_c) ), name="Eq-8")
     
     # Eq. 9
     D_ICEP.addConstrs((gb.quicksum(W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b)) <= 1 for i in range(num_i)), name="Eq-9")

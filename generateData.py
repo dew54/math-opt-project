@@ -80,6 +80,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
         print(probabilities[s])
 
         scenarios.append(scenario)
+    for s in range(numScenarios):
 
         capacities = []
         resourcesPerScenario = []
@@ -92,17 +93,11 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
             resourcesPerScenario.append(resource)
         resources.append(resourcesPerScenario)
         
-        min_k = math.ceil((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a)))/(sum(resources[s][i].capacity for i in range(num_i))))
-        max_k = math.floor((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a))/(min(capacities))))
+        # min_k = math.ceil((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a)))/(sum(resources[s][i].capacity for i in range(num_i))))
+        # max_k = math.floor((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a))/(min(capacities))))
+  
         
-        scenarios[s].num_k = min_k 
-        
-        num_k = 10 
-        
-
-
-        for resource in resources[s]:
-            scenarios[s].num_k = num_k
+                
 
         
         
@@ -112,7 +107,7 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
             alfa[keys] = arc
 
     for s in range(numScenarios):
-        scenarios[s].num_k = math.ceil((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a)))/(sum(resources[s][i].capacity for i in range(num_i))))
+        scenarios[s].num_k = math.ceil(2*(sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a)))/(sum(resources[s][i].capacity for i in range(num_i))))
 
 
 
@@ -213,7 +208,6 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
     data['params']['b'] = num_b
     data['params']['h'] = num_h
     data['params']['c'] = num_c
-    data['params']['k'] = num_k
     data['params']['s'] = numScenarios
     data['params']['self'] = num_selfEva
     #data['params']['demand'] = evaDemand

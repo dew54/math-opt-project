@@ -45,11 +45,12 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
         areas.append(area)
 
     
-    min_k = math.ceil((sum(areas[a].evaDemand for a in range(num_a)))/(sum(resources[i].capacity for i in range(num_i))))
+    min_k = math.ceil(2*(sum(areas[a].evaDemand for a in range(num_a)))/(sum(resources[i].capacity for i in range(num_i))))
     max_k = math.floor((sum(areas[a].evaDemand for a in range(num_a))/(min(capacities))))
 
     #if(abs(min_k-max_k) <= 1):
-    num_k = min_k
+
+    num_k = min_k# if min_k > 1 else 2
     # else:
         # num_k = random.randint(min_k, max_k)
 

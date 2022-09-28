@@ -173,10 +173,12 @@ def runExpeStochastic(data, params, timeLimit = -1):
     # Set up objective functions
     o = 0
     firstObj = dict()
+
     bal = (((gb.quicksum(resources[s][i].fixedCost * Z_i[i] for i in range(num_i)))/(sum(resources[s][i].fixedCost + 
          resources[s][i].getVarCost(T) for i in range(num_i))))) # + ((gb.quicksum(scenarios[s].probability * 
         # (r[s] + fraction[s]) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))) for s in range(num_s))))
 
+    #S_ICEP.setObjectiveN(bal, 0, 1)
     econ = (resources[s][i].fixedCost * Z_i[i] for i in range(num_i))
     firstObj['bal_1'] = bal
     firstObj['bal_2'] = bal

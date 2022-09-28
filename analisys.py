@@ -10,7 +10,7 @@ from utils import Utils
 from plotting import Plotting
 import random
 
-num_i = 3               # Number of potential resources for evacuation purpouses
+num_i = 6               # Number of potential resources for evacuation purpouses
 num_a = 2               # Number of areas to be evacuated
 num_b = 2               # Number of pickUp points where people are loaded on rescue vehicles
 num_c = 3               # Number of shelters where people is dropped off
@@ -18,7 +18,7 @@ num_h = 2               # Number of initial locations from where rescue resource
 num_t = 1 
 num_selfEva = 10
 evaDemand = 100
-numClas = 1
+numClas = 3
 numScenarios = 1
 upperTimeLimit = 500
 penalty = 7000
@@ -63,30 +63,76 @@ nuClas = list(range(1, numClas+1))
 
 resources = []
 numNodes = []
+valNodes = dict()
+valNodes['a'] = []
+valNodes['b'] = []
+valNodes['c'] = []
+valNodes['h'] = []
+valNodes['i'] = []
 time = []
 X = []
 nVars = []
 index = 0
 # sum = num_i + num_a + num_b + num_c + num_h
 
-population = range(50,750,100)
+# population = range(50,2050,100)
 
-for evaDemand in population:
-    data = generateSimpleData.generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)
-    status, runtime, objVal, experiment = runExpe.runExpe(data, 50)
-    time.append(runtime)
-    X.append(index)
-    nVars.append(len(experiment.getVars()))
-    index = index +1
+# for evaDemand in population:
+#     random.seed(123)
+#     data = generateSimpleData.generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)
+#     status, runtime, objVal, experiment = runExpe.runExpe(data, 50)
+#     if status == 2:
+#         time.append(runtime)
+#         X.append(index)
+#         nVars.append(len(experiment.getVars()))
+#         index = index +1
 
 
-fig1, axs1 = plt.subplots(2,2)
+# fig1, axs1 = plt.subplots(2)
+# #fig1.suptitle('Vertically stacked subplots')
+# axs1[0].plot(X, time )
+# #plt.grid()
+
+# #axs1[0][1].plot(X, numNodes)
+# axs1[1].plot(X,  nVars )
+
+for nc in nuClas:
+    random.seed(123)
+    for i in range(nc, num_i+1):
+        for h in range(nc, num_h +1):
+            for a in range(nc, num_a+1):
+                for b in range(nc, num_b+1):
+                    for c in range(nc, num_c+1):
+                        
+                        data = generateSimpleData.generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)
+                        status, runtime, objVal, experiment = runExpe.runExpe(data, 50)
+                        if status == 2:
+                            time.append(runtime)
+                            X.append(index)
+                            nVars.append(len(experiment.getVars()))
+                            print(len(experiment.getVars()))
+                            index = index +1
+                            nodes = (a + b + c + h + i + nc)
+                            valNodes['a'].append(a)
+                            valNodes['b'].append(b)
+                            valNodes['c'].append(c)
+                            valNodes['h'].append(h)
+                            valNodes['i'].append(i)
+                            numNodes.append(nodes)
+                            experiment.reset()
+fig1, axs1 = plt.subplots(2, 2)
 #fig1.suptitle('Vertically stacked subplots')
 axs1[0][0].plot(X, time )
+axs1[0][0].set_title('Runtime')
 #plt.grid()
 
-#axs1[0][1].plot(X, numNodes)
-axs1[1][0].plot(X,  nVars )
+axs1[1][0].plot(X, numNodes, valNodes['a'], valNodes['a'])
+axs1[1][0].set_title('# of nodes')
+
+axs1[0][1].plot(X,  nVars )
+axs1[0][1].set_title('# of Vars')
+
+
 
 
 
