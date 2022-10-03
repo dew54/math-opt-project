@@ -10,12 +10,12 @@ from utils import Utils
 import plotting
 
 
-num_i = 3
-num_a = 2
-num_b = 2
-num_c = 3
+num_i = 1
+num_a = 1
+num_b = 1
+num_c = 1
 num_h = 1
-num_selfEva = 5
+num_selfEva = 0
 numClas = 1
 numScenarios = 1
 upperTimeLimit = 320 #  minutes

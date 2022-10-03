@@ -1,4 +1,5 @@
 import random
+import math
 
 from utils import Utils
 
@@ -27,9 +28,9 @@ class Resource:
         self.initialLocation = initialLocations[index]
 
     def setSpeed(self, coeff):
-
-        self.emptySpeed *= coeff
-        self.loadedSpeed *= coeff
+        self.emptySpeed = math.ceil(self.emptySpeed * coeff)
+        self.loadedSpeed = math.ceil(self.loadedSpeed * coeff)
+        
     
     def getVarCost(self, T):
         cost = self.varCost * T

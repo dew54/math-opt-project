@@ -1,4 +1,5 @@
 from utils import Utils
+import math
 class Arc:
     def __init__(self, startNode, endNode, resource, typ):
         
@@ -13,19 +14,19 @@ class Arc:
         
         if(typ == "gamma"):
             self.resource = resource
-            self.cost = self.length/resource.loadedSpeed
+            self.cost = math.ceil(self.length/resource.loadedSpeed)
             self.flow = resource.capacity/self.cost
             self.trip = resource.trip #SERVE???
             #self.isLegit = self.isLegit()
         elif(typ == "delta"):
             self.resource = resource
-            self.cost = self.length/resource.emptySpeed
+            self.cost = math.ceil(self.length/resource.emptySpeed)
             self.flow = resource.capacity/self.cost
             self.trip = resource.trip #SERVE???
             #self.isLegit = self.isLegit()
         elif(typ == "zeta"):
             self.resource = resource
-            self.cost = self.length/resource.emptySpeed
+            self.cost = math.ceil(self.length/resource.emptySpeed)
             self.flow = 0
             self.trip = 0
             #self.isLegit = self.isLegit()
