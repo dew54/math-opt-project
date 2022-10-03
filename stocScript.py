@@ -10,14 +10,14 @@ from utils import Utils
 import plotting
 
 
-num_i = 1
-num_a = 1
-num_b = 1
-num_c = 1
-num_h = 1
+num_i = 3
+num_a = 2
+num_b = 2
+num_c = 2
+num_h = 2
 num_selfEva = 0
 numClas = 1
-numScenarios = 1
+numScenarios = 2
 upperTimeLimit = 320 #  minutes
 m = 0
 penalty = 9000

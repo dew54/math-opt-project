@@ -78,19 +78,19 @@ def runExpe(data, timeLimit = -1):
     # for i in range(num_i-1): 
         
     # Eq. 3
-    D_ICEP.addConstrs(((gb.quicksum( zeta[i, h, b].cost * W_i_1_hb[i, h, b]  for (i, h, b) in zeta.keys()) #for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta ) 
+    D_ICEP.addConstrs(((gb.quicksum( zeta[i, h, b].cost * W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta ) 
         + 
-            gb.quicksum(gamma[i, k, b, c].cost * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) #for k in range(num_k) for b in range(num_b) for c in range(num_c) if(i, k, b, c) in gamma)
+            gb.quicksum(gamma[i, k, b, c].cost * X_i_k_bc[i, k, b, c] for k in range(num_k) for b in range(num_b) for c in range(num_c) if(i, k, b, c) in gamma)
         +
-            gb.quicksum(delta[i, k, c, b].cost * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys() ) #for k in range(num_k) for c in range(num_c) for b in range(num_b) if (i, k, c, b) in delta)
+            gb.quicksum(delta[i, k, c, b].cost * Y_i_k_cb[i, k, c, b] for k in range(num_k) for c in range(num_c) for b in range(num_b) if (i, k, c, b) in delta)
         +
-            gb.quicksum(resources[i].timeToAvaiability * W_i_1_hb[i, h, b] for(i, h, b) in zeta.keys())  #for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta) 
+            gb.quicksum(resources[i].timeToAvaiability * W_i_1_hb[i, h, b] for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta) 
         +
-            gb.quicksum(resources[i].loadingTime * W_i_1_hb[i, h, b]  for (i, h, b) in zeta.keys())#for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta) 
+            gb.quicksum(resources[i].loadingTime * W_i_1_hb[i, h, b]  for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta) 
         +
-            gb.quicksum(resources[i].loadingTime * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys()) #for k in range(num_k) for c in range(num_c) for b in range(num_b) if(i, k, c, b) in delta)
+            gb.quicksum(resources[i].loadingTime * Y_i_k_cb[i, k, c, b] for k in range(num_k) for c in range(num_c) for b in range(num_b) if(i, k, c, b) in delta)
         +
-            gb.quicksum(resources[i].unloadingTime * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) #for k in range(num_k) for b in range(num_b) for c in range(num_c) if (i, k, c, b) in delta)
+            gb.quicksum(resources[i].unloadingTime * X_i_k_bc[i, k, b, c] for k in range(num_k) for b in range(num_b) for c in range(num_c) if (i, k, c, b) in delta)
 
         == 
             S_i[i]) for i in range(num_i)) , name="Eq-3")
