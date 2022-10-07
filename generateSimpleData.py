@@ -1,11 +1,12 @@
 import math
 import random
 import os
+import yaml
 import toml
 #import pandas as pd
-from resource import Resource
-from node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
-from arc import *
+from classes.resource import Resource
+from classes.node import * #Node, SourceNode, EvaArea, PickUpPoint, Shelter, ResInitialLocation, SinkNode
+from classes.arc import *
 
 def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas):
     
@@ -25,9 +26,10 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
         else:
             resource.clas = 0
         
-        resources.append(resource)
-        
+        resources.append(resource)        
         capacities.append(resource.capacity)
+    
+
             
     sourcePosition = [random.randint(1, 10), random.randint(49, 51) ]
     
@@ -40,7 +42,8 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
     areas = []
     for index in range(num_a):
         position = [random.randint(15, 30), random.randint(1, 99) ]
-        area = EvaArea(position, "evaArea", index)
+
+        area = EvaArea(position, "evaArea", 0)
         area.evaDemand = evaDemand
         areas.append(area)
 
@@ -50,7 +53,10 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
 
     #if(abs(min_k-max_k) <= 1):
 
-    num_k = min_k# if min_k > 1 else 2
+    num_k = min_k
+    print('min_k becomes: ', min_k)
+
+    print('max_k becomes: ', num_k)
     # else:
         # num_k = random.randint(min_k, max_k)
 
@@ -63,13 +69,19 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
     pickUpPoints = []
     for index in range(num_b):
         position = [random.randint(31, 60), random.randint(1, 99) ]
-        pickUpPoint = PickDropPoint(position, "pick_up", index)
+        if index < numClas:
+            pickUpPoint = PickDropPoint(position, "pick_up", index)
+        else:
+            pickUpPoint = PickDropPoint(position, "pick_up", 0)
         pickUpPoints.append(pickUpPoint)
     
     shelters = []
     for index in range(num_c):
         position = [random.randint(61, 85), random.randint(1, 99) ]
-        shelter = PickDropPoint(position, "shelter", index)
+        if index < numClas:
+            shelter = PickDropPoint(position, "shelter", index)
+        else:
+            shelter = PickDropPoint(position, "shelter", 0)
         shelters.append(shelter)
     
     alfa = dict()                                                                   # from source s to area a
@@ -192,9 +204,9 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
     data['params']['self'] = num_selfEva
     data['params']['demand'] = evaDemand
 
-    # with open(os.path.join(os.path.dirname(__file__),'config.toml'),'w') as f:
-    #     toml.dump(data, f)
 
+    with open('config.yaml','w') as f:
+        yaml.dump(data, f)
     return data
 
 

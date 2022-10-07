@@ -45,7 +45,6 @@ class Utils:
         b = scenario.weather["rain"][key][scenario.rainLevel]
         c = scenario.weather["light"][key][scenario.lightLevel]
         coeff = (a + b + c)/3
-        print(coeff)
         return coeff
 
 

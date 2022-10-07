@@ -63,6 +63,7 @@ def runExpe(data, timeLimit = -1):
     S_i = D_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="timeForResourceI")
     r = D_ICEP.addVar(vtype=gb.GRB.INTEGER, name="totalTime")
     #print(gamma[0][0][0])
+    IsLegit_b_c = D_ICEP.addVars([(i, k, b, c) for i in range(num_i) for k in range(num_k) for b in range(num_b) for c in range(num_c) ], vtype=gb.GRB.INTEGER, name="gammaLegit")
 
     #plt.show()
     #plt.pause(0.001)
@@ -70,6 +71,7 @@ def runExpe(data, timeLimit = -1):
 
     # ## COnstraints
     #with suppress(Exception):   
+    D_ICEP.addConstrs(IsLegit_b_c[i, k, b, c] == gamma[i, k, b, c].isLegit for (i, k, b, c) in gamma.keys() )
 
     # Eq. 2
     D_ICEP.addConstrs((S_i[i]<=r for i in range(num_i)), name="Eq-2")
@@ -95,43 +97,6 @@ def runExpe(data, timeLimit = -1):
         == 
             S_i[i]) for i in range(num_i)) , name="Eq-3")
 
-
-    # D_ICEP.addConstrs(((gb.quicksum( zeta[i, h, b].cost * W_i_1_hb[i, h, b]  for (i, h, b) in zeta.keys()) #for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta ) 
-    #     + 
-    #         gb.quicksum(gamma[i, k, b, c].cost * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) #for k in range(num_k) for b in range(num_b) for c in range(num_c) if(i, k, b, c) in gamma)
-    #     +
-    #         gb.quicksum(delta[i, k, c, b].cost * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys() ) #for k in range(num_k) for c in range(num_c) for b in range(num_b) if (i, k, c, b) in delta)
-    #     +
-    #         gb.quicksum(0 * W_i_1_hb[i, h, b] for(i, h, b) in zeta.keys())  #for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta) 
-    #     +
-    #         gb.quicksum(0 * W_i_1_hb[i, h, b]  for (i, h, b) in zeta.keys())#for h in range(num_h) for b in range(num_b) if (i, h, b) in zeta) 
-    #     +
-    #         gb.quicksum(0 * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys()) #for k in range(num_k) for c in range(num_c) for b in range(num_b) if(i, k, c, b) in delta)
-    #     +
-    #         gb.quicksum(0 * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) #for k in range(num_k) for b in range(num_b) for c in range(num_c) if (i, k, c, b) in delta)
-
-    #     == 
-    #         S_i[i]) for i in range(num_i)) , name="Eq-3")
-
-    #Eq. 3
-    # D_ICEP.addConstrs(((
-            
-    #         gb.quicksum(1.1 * W_i_1_hb[i, h, b]  for (i, h, b) in zeta.keys()) # cost of arc zeta
-    #     + 
-    #         gb.quicksum(0 * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) # Cost of arc gamma
-    #     +
-    #         gb.quicksum(0 * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys() ) # Cost of arc delta
-    #     +
-    #         gb.quicksum(0 * W_i_1_hb[i, h, b] for(i, h, b) in zeta.keys())  # Loading time at zeta
-    #     +
-    #         gb.quicksum(0 * W_i_1_hb[i, h, b]  for (i, h, b) in zeta.keys()) # Time to avaiability for resource
-    #     +
-    #         gb.quicksum(0 * Y_i_k_cb[i, k, c, b] for (i, k, c, b) in delta.keys()) # Loading time
-    #     +
-    #         gb.quicksum(0 * X_i_k_bc[i, k, b, c] for (i, k, b, c) in gamma.keys()) # Unloading time
-
-        # == 
-        #     S_i[i]) for i in range(num_i)) , name="Eq-3")
 
 
     # Eq. 4
@@ -195,9 +160,9 @@ def runExpe(data, timeLimit = -1):
     D_ICEP.addConstr((r >= 0), name="Eq-20")
 
     # Eq. 19        Added by the student: ensures that a road is chosen only if its arc is compatible
-    D_ICEP.addConstrs(W_i_1_hb[i, h, b] <= zeta[i, h, b].isLegit() for (i, h, b) in zeta.keys())
-    D_ICEP.addConstrs(X_i_k_bc[i, k, b, c] <= gamma[i, k, b, c].isLegit() for (i, k, b, c) in gamma.keys())
-    D_ICEP.addConstrs(Y_i_k_cb[i, k, c, b] <= delta[i, k, c, b].isLegit() for (i, k, c, b) in delta.keys())#if k != num_k-1)
+    D_ICEP.addConstrs(W_i_1_hb[i, h, b] <= zeta[i, h, b].isLegit for (i, h, b) in zeta.keys())
+    D_ICEP.addConstrs(X_i_k_bc[i, k, b, c] <= gamma[i, k, b, c].isLegit for (i, k, b, c) in gamma.keys())
+    D_ICEP.addConstrs(Y_i_k_cb[i, k, c, b] <= delta[i, k, c, b].isLegit for (i, k, c, b) in delta.keys())#if k != num_k-1)
 
 
 

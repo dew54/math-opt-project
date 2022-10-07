@@ -5,8 +5,8 @@ import runExpe
 
 num_i = 1               # Number of potential resources for evacuation purpouses
 num_a = 2               # Number of areas to be evacuated
-num_b = 2               # Number of pickUp points where people are loaded on rescue vehicles
-num_c = 2               # Number of shelters where people is dropped off
+num_b = 1               # Number of pickUp points where people are loaded on rescue vehicles
+num_c = 1               # Number of shelters where people is dropped off
 num_h = 1               # Number of initial locations from where rescue resources depart
 num_t = 1               # Number of sink node (to not be changed)
 evaDemand = 1           # Number of people per area
@@ -14,7 +14,6 @@ num_selfEva = 0         # Number of self evacuees (people that can safe themself
 numClas = 1             # Number of classes of rescue resources
 
 data = generateSimpleData.generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)
-
 
 
 status, runtime, objVal, experiment = runExpe.runExpe(data, 1000)
@@ -32,4 +31,4 @@ plotting.plotDeltaArc(vars, i, k)   # Plot arcs from shelters back to pickUp poi
 plotting.plotGammaArc(vars, i, k+1) # Plot arcs from pickUp to shelters in the succesively trip
 plotting.show()
 
-print("Solution found in ", runtime, "seconds. Total rescue time: ", objVal, "unitTime")
+print("Solution found in ", runtime, "seconds. Total rescue time: ", objVal, "minutes")
