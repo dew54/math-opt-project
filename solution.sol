@@ -1,5 +1,5 @@
 # Solution for model s-icep
-# Objective value = 1.2560992399415544e+06
+# Objective value = 1.9035860394483670e+06
 flowLmbda[0,0,0] 25
 flowLmbda[0,1,0] 25
 flowLmbda[0,2,0] 25
