@@ -13,11 +13,18 @@ class Arc:
         self.flow = int()
         
         if(typ == "gamma"):
-            self.resource = resource
-            self.cost = math.ceil((self.length/resource.loadedSpeed)*speedCoeff)
-            self.flow = resource.capacity/self.cost
-            self.trip = resource.trip #SERVE???
-            self.isLegit = self.legit()
+            try:
+                self.resource = resource
+                self.cost = math.ceil((self.length/resource.loadedSpeed)*speedCoeff)
+                
+                self.flow = resource.capacity/self.cost
+                
+                self.trip = resource.trip #SERVE???
+                self.isLegit = self.legit()
+            except:
+                print('coeff is: ',speedCoeff)
+                print('length is: ', self.length)
+
         elif(typ == "delta"):
             self.resource = resource
             self.cost = math.ceil((self.length/resource.emptySpeed)*speedCoeff)

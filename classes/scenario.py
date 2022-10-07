@@ -40,7 +40,7 @@ class Scenario:
             4 : 0.1
         }
 
-        self.speedCoeff = 1 - 1/(1+Utils.computeCoefficient(self, "drive")*10)
+        self.speedCoeff =  1/(1+Utils.computeCoefficient(self, "drive")*10)
         self.loadingCoeff = 1 + Utils.computeCoefficient(self, "loadingOps")*10
           
         self.probability = distribution[self.severity]

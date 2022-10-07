@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib import collections  as mc
 from contextlib import suppress
 import math
+import random
 
 
 from classes.resource import Resource
@@ -18,6 +19,7 @@ from classes.utils import Utils
 def throwSequence():
     parameters = { #          s, i, a, b, c, h
         1 : [1, 1, 1, 1, 1, 1],
+        2 : [2, 2, 2, 2, 2, 2],
         2 : [2, 2, 2, 2, 2, 2],
         3 : [2, 4, 3, 3, 2, 2],
         4 : [2, 4, 3, 4, 3, 3],
@@ -34,16 +36,22 @@ def throwSequence():
         16 : [7, 9, 8, 11, 8, 8],
         17 : [7, 9, 9, 11, 8, 8],
         18 : [8, 9, 9, 11, 8, 8],
-        19 : [8, 10, 9, 12, 9, 8],
-        20 : [8, 10, 9, 12, 9, 9]
+        19 : [8, 10, 9, 12, 9, 9],
+        20 : [8, 10, 10, 12, 9, 9],
+        21 : [9, 11, 10, 12, 9, 9],
+        22 : [9, 11, 10, 13, 10, 9],
+        23 : [9, 11, 11, 13, 10, 10],
+        24 : [10, 12, 11, 14, 10, 10],
+        25 : [10, 12, 11, 14, 11, 10],
+        26 : [10, 12, 11, 14, 11, 10]
     }
-    num_i = 2
-    num_a = 2
-    num_b = 2
-    num_c = 2
-    num_h = 1
+    # num_i = 2
+    # num_a = 2
+    # num_b = 2
+    # num_c = 2
+    # num_h = 1
 
-    parameters = {a  :  [(s, i, a, b, c, h) for s in range(2) for i in range(num_i) for a in range(num_a) for b in range(num_b) for c in range(num_c) for h in range(num_h) for _ in range(2)] for a in range(2) } 
+    #parameters = {a  :  [(s, i, a, b, c, h) for s in range(2) for i in range(num_i) for a in range(num_a) for b in range(num_b) for c in range(num_c) for h in range(num_h) for _ in range(2)] for a in range(2) } 
     upperTimeLimit = 0.1 #  minutes
     m = 0
     penalty = 1.5
@@ -86,6 +94,7 @@ def throwSequence():
         num_b = row[3]
         num_c = row[4]
         num_h = row[5]
+        random.seed(123)
         
         data = generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas, numScenarios)
         status, runtime, objVal, experiment = runExpeStochastic(data, params)
