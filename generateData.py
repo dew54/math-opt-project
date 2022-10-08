@@ -106,12 +106,10 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
         sum_i = sum(resources[i].capacity for i in range(num_i))
 
         scenarios[s].num_k = math.ceil(2*(sum_a)/(sum_i))
-        print('num_k for this scenario is: ', scenarios[s].num_k)
-        print('sum a is: ', sum_a)
-        print('sum_i is: ', sum_i)
+        # print('num_k for this scenario is: ', scenarios[s].num_k)
+        # print('sum a is: ', sum_a)
+        # print('sum_i is: ', sum_i)
         
-        # min_k = math.ceil((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a)))/(sum(resources[i].capacity for i in range(num_i))))
-        # max_k = math.floor((sum(scenarios[s].evaAreas[a].evaDemand for a in range(num_a))/(min(capacities))))
   
     print('=========End computing k values=========')
                 

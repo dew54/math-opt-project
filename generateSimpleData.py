@@ -205,8 +205,7 @@ def generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand
     data['params']['demand'] = evaDemand
 
 
-    with open('config.yaml','w') as f:
-        yaml.dump(data, f)
+
     return data
 
 

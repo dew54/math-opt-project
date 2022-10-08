@@ -208,7 +208,7 @@ def runExpeStochastic(data, params, timeLimit = -1):
     S_ICEP = gb.Model("s-icep")
     if timeLimit !=-1:
         S_ICEP.setParam("TimeLimit", timeLimit)
-    #D_ICEP.Params.LogToConsole = 0  # suppress the log of the model
+    S_ICEP.Params.LogToConsole = 0  # suppress the log of the model
     S_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
     FL_a_t = S_ICEP.addVars([(s, a, t) for (s, a, t) in lmbda.keys()], vtype=gb.GRB.INTEGER, name="flowLmbda")
     FL_i_k_ab = S_ICEP.addVars([(s, i, k, a, b) for (s, i, k, a, b) in beta.keys() ], vtype=gb.GRB.INTEGER, name="flowBeta")
@@ -218,6 +218,7 @@ def runExpeStochastic(data, params, timeLimit = -1):
     X_i_k_bc = S_ICEP.addVars([(s, i, k, b, c) for (s, i, k, b, c) in gamma.keys()], vtype=gb.GRB.BINARY, name="gammaSelect")
     Y_i_k_cb = S_ICEP.addVars([(s, i, k, c, b) for (s, i, k, c, b) in delta.keys() ], vtype=gb.GRB.BINARY, name="deltaSelect")
     S_i = S_ICEP.addVars([(s, i) for s in range(num_s) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="timeForResourceI")
+    S_mean = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="meanTimeForResourceI")
     Z_i = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.BINARY, name="isResInFleet")
     N_a = S_ICEP.addVars([(s, a) for s in range(num_s) for a in range(num_a)], vtype=gb.GRB.INTEGER, name="numNotEva")
     r = S_ICEP.addVars( [(s) for s in range(num_s)], vtype=gb.GRB.INTEGER, name="totalTime")
@@ -247,25 +248,7 @@ def runExpeStochastic(data, params, timeLimit = -1):
                 S_i[s, i]) for s in range (num_s) for i in range(num_i)) , name="Eq-3")
 
 
-    # Eq. 3
-    # S_ICEP.addConstrs(((gb.quicksum( 14 *  W_i_1_hb[s, i, h, b]  for h in range(num_h) for b in range(num_b)) 
-    #         + 
-    #             gb.quicksum(20 * 
-    #              X_i_k_bc[s, i, k, b, c] for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c))
-    #         +
-    #             gb.quicksum(20 *  
-    #             Y_i_k_cb[s, i, k, c, b] for k in range(scenarios[s].num_k) for c in range(num_c) for b in range(num_b))
-    #         +
-    #             gb.quicksum(1.2 *  W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) 
-    #         +
-    #             gb.quicksum(1*  W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) 
-    #         +
-    #             gb.quicksum(1 *  Y_i_k_cb[s, i, k, c, b] for k in range(scenarios[s].num_k) for c in range(num_c) for b in range(num_b))
-    #         +
-    #             gb.quicksum(1 *  X_i_k_bc[s, i, k, b, c] for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c))
 
-    #         == 
-    #             S_i[s, i]) for s in range (num_s) for i in range(num_i)) , name="Eq-3")
 
     # Eq. 4
     S_ICEP.addConstrs((FL_a_t[s, a, t] <= lmbda[s, a, t].flow  for (s, a, t) in lmbda.keys())) #for a in range(num_a) if(a, 0) in lmbda ) ,name="Eq-4" )
@@ -340,6 +323,8 @@ def runExpeStochastic(data, params, timeLimit = -1):
     # Eq. 35
     S_ICEP.addConstrs(((N_a[s, a] >= 0 )for s in range(num_s) for a in range(num_a)), name="Eq-35")
 
+    S_ICEP.addConstrs((S_mean[i] == gb.quicksum( S_i[s, i] for s in range(num_s) )for i in range(num_i) ), name='meanTime- Eq.')
+
     fraction = []
     
     for s in range(num_s):
@@ -405,11 +390,11 @@ def runExpeStochastic(data, params, timeLimit = -1):
 
     # S_ICEP.setObjectiveN(firstObj[objFunction] + gb.quicksum(scenarios[s].probability*secondObj[s] for s in range(num_s)), 0, 1)
     #S_ICEP.tune()
-    S_ICEP.write("mymodel.lp")
+    S_ICEP.write("model/mymodel.lp")
     S_ICEP.optimize()
 
     if S_ICEP.status == 2:
-        S_ICEP.write("solution.sol")
+        S_ICEP.write("model/solution.sol")
         
         return S_ICEP.status, S_ICEP.Runtime, S_ICEP.ObjVal, S_ICEP
     else:
