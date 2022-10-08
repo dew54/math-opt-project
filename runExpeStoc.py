@@ -45,6 +45,19 @@ def throwSequence():
         25 : [10, 12, 11, 14, 11, 10],
         26 : [10, 12, 11, 14, 11, 10]
     }
+
+    demand = {
+        1 : [50, 100],
+        2 : [250, 300],
+        3 : [450, 500],
+        4 : [750, 800],
+        5 : [950, 1000],
+        6 : [1450, 1500],
+        7 : [2450, 2500],
+        8 : [4950, 5000],
+        9 : [9950, 10000],
+        10 : [15000, 20000],
+    }
     # num_i = 2
     # num_a = 2
     # num_b = 2
@@ -85,9 +98,12 @@ def throwSequence():
     numNodes = []
     numInst = []
     numScen = []
+    numK = []
 
 
-    for row in parameters.values():
+    #for row in parameters.values():
+    for evaDemand in demand.values():
+        row = parameters[4]
         numScenarios = row[0]
         num_i = row[1]
         num_a = row[2]
@@ -105,17 +121,21 @@ def throwSequence():
             nVars.append(len(experiment.getVars()))
             index = index +1
             obj.append(objVal)
-            numNodes.append((num_a + num_b + num_c + num_h) * num_i * numScenarios)
-            numInst.append(num_i)
-            numScen.append(numScenarios)
-    fig1, axs1 = plt.subplots(3, 2)
+            numK.append(data["scenarios"][0].num_k)
+            #numNodes.append((num_a + num_b + num_c + num_h) * num_i * numScenarios)
+            # numInst.append(num_i)
+            # numScen.append(numScenarios)
+    fig1, axs1 = plt.subplots(2, 2)
     #fig1.suptitle('Vertically stacked subplots')
     axs1[0][0].plot(X, time )
     axs1[0][0].set_title('Runtime')
     #plt.grid()
 
-    axs1[1][0].plot(X, numNodes)
-    axs1[1][0].set_title('# of nodes')
+    axs1[1][0].plot(X, numK)
+    axs1[1][0].set_title('# roundTrips')
+    
+    # axs1[1][0].plot(X, numNodes)
+    # axs1[1][0].set_title('# of nodes')
 
     axs1[0][1].plot(X,  nVars )
     axs1[0][1].set_title('# of Vars')
@@ -123,11 +143,11 @@ def throwSequence():
     axs1[1][1].plot(X,  obj )
     axs1[1][1].set_title('Obj Values')
 
-    axs1[2][0].plot(X,  numInst )
-    axs1[2][0].set_title('# Instances')
+    # axs1[2][0].plot(X,  numK )
+    # axs1[2][0].set_title('# roundTrips')
 
-    axs1[2][1].plot(X,  numScen )
-    axs1[2][1].set_title('# Scenarios')
+    # axs1[2][1].plot(X,  numScen )
+    # axs1[2][1].set_title('# Scenarios')
     plt.show()
 
 
