@@ -49,6 +49,27 @@ class Utils:
         coeff = (a + b + c)/3
         return coeff
 
+    def getVars(self, variables, name):
+        vars = dict()
+        values = []
+        keys = []
+        
+        for l in range(len(variables)):
+            if name in str(variables[l].VarName):   
+                
+                keys.append(self.getKeys(variables[l].VarName))
+                values.append(variables[l].X) 
+        
+        
+        return values, keys
+
+# def computeAverage(self, variables, name):
+#     values, keys = self.getVars(self, variables, name)
+#     for i in range(len(keys)):
+#         for k in keys[i]:
+
+
+
 
 
 
