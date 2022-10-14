@@ -33,15 +33,16 @@ class Scenario:
         self.lightLevel = random.randint(0, 4)
         self.severity = math.ceil((self.windLevel + self.rainLevel + self.lightLevel)/3) 
         distribution = {
-            0 : 0.6,
-            1 : 0.8,
-            2 : 0.5,
-            3 : 0.3,
-            4 : 0.1
+            0 : 0.25,
+            1 : 0.35,
+            2 : 0.25,
+            3 : 0.1,
+            4 : 0.05
         }
 
-        self.speedCoeff =  1/(1+Utils.computeCoefficient(self, "drive")*10)
-        self.loadingCoeff = 1 + (1- 1/(1+Utils.computeCoefficient(self, "loadingOps")*10))
+        self.speedCoeff = 1/(1+Utils.computeCoefficient(self, "drive"))**self.severity
+        
+        self.loadingCoeff = 1 + (1- 1/(1+Utils.computeCoefficient(self, "loadingOps"))**self.severity)
           
         self.probability = distribution[self.severity]
         self.evaAreas = evaAreas

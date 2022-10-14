@@ -81,7 +81,7 @@ def runExpe(data, timeLimit = -1):
     D_ICEP = gb.Model("icep")
     #D_ICEP.Params.LogToConsole = 0  # suppress the log of the model
     D_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
-    if timeLimit !=0:
+    if timeLimit > 0:
         D_ICEP.setParam("TimeLimit", timeLimit)
 
 

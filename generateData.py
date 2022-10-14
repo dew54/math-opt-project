@@ -14,36 +14,36 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
 
     print('=========Creating nodes=========')
     # Start node generation
-    sourcePosition = [random.randint(1, 10), random.randint(49, 51) ]
+    sourcePosition = [5, 50] #[random.randint(1, 10), random.randint(49, 51) ]
     
     source = Node(sourcePosition,"source", 1)
 
-    sinkPosition = [random.randint(90, 99), random.randint(49, 51) ]
+    sinkPosition = [95, 50]#[random.randint(90, 99), random.randint(49, 51) ]
 
     sink = Node(sinkPosition, "sink", 1)
 
 
     initialLocations = []
     for index in range(num_h):
-        position = [random.randint(10, 15), random.randint(1, 99) ]
+        position = [12, 25+(50/(num_h))*index+1] # [random.randint(10, 15), random.randint(1, 99) ]
         initialLocation = Node(position, "initial", index)
         initialLocations.append(initialLocation)
 
     pickUpPoints = []
     for index in range(num_b):
-        position = [random.randint(31, 60), random.randint(1, 99) ]
+        position = [45, 25+(50/(num_b))*index+1] # [random.randint(31, 60), random.randint(1, 99) ]
         pickUpPoint = PickDropPoint(position, "pick_up", index)
         pickUpPoints.append(pickUpPoint)
 
     shelters = []
     for index in range(num_c):
-        position = [random.randint(61, 85), random.randint(1, 99) ]
+        position = [65,25+ (50/(num_c))*(index+1)] # [random.randint(61, 85), random.randint(1, 99) ]
         shelter = PickDropPoint(position, "shelter", index)
         shelters.append(shelter)
         
     areas = []
     for index in range(num_a):
-        position = [random.randint(15, 30), random.randint(1, 99) ]
+        position = [9,25+ (50/(num_a+1)*(index+1)) ] #[random.randint(15, 30), random.randint(1, 99) ]
         area = EvaArea(position, "evaArea", index)
         #area.evaDemand = scenario.evaDemand
         areas.append(area)
@@ -187,8 +187,11 @@ def generateData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand,  num
                 for b_i in range(num_b):
                     endNode = pickUpPoints[b_i]
                     arc = Arc(startNode, endNode, resource, "zeta", scenarios[s].speedCoeff)
+#                    if arc.isInitialLocValid():
+
                     keys = s, i, h_i, b_i
                     zeta[keys] = arc
+
     for s in range(numScenarios):
         for a in range(num_a):
             areas[a].selfEva = num_selfEva

@@ -17,14 +17,14 @@ class Resource:
     def populate(self, initialLocations):
 
         self.index = random.randint(1, 20)
-        self.capacity = random.randint(self.index,self.index*5)
+        self.capacity = random.randint(15, 30)
         self.timeToAvaiability = random.randint(10, 25)
         self.loadingTime = random.randint(8, 20)
-        self.fixedCost = self.index * 500
-        self.varCost = self.index/10 # cost per unit time
+        self.fixedCost = self.index * 10000
+        self.varCost = self.index * 1.5# cost per unit time
         self.unloadingTime = random.randint(4, 15)
-        self.emptySpeed = self.index/3                                #Km/min
-        self.loadedSpeed = self.emptySpeed * 0.77                    #Km/min
+        self.emptySpeed = 3 #(21- self.index)/3                                #Km/min
+        self.loadedSpeed = self.emptySpeed * 0.77                           #Km/min
         self.maxTrips = 0 
         h = len(initialLocations)
         index = random.randint(0, h-1 )
@@ -36,8 +36,8 @@ class Resource:
         self.loadedSpeed = math.ceil(self.loadedSpeed * coeff)
         
     
-    def getVarCost(self, T):
-        cost = self.varCost * T
+    def getVarCost(self, V):
+        cost = self.varCost * V
         return cost
     
     def getAvaiability(self, s):

@@ -153,18 +153,18 @@ def throwSequence():
 
 
 def throw():
-    num_i = 10
+    num_i = 1
     num_a = 3
     num_b = 3
     num_c = 2
     num_h = 1
     num_selfEva = 10
     numClas = 1
-    numScenarios = 4
-    upperTimeLimit = 0.1 #  minutes
+    numScenarios = 1
+    upperTimeLimit = 300 #  minutes
     m = 0
     penalty = 1.5
-    evaDemand = [50, 700]
+    evaDemand = [50, 70]
     objFunction = {
         1 : 'bal_1',
         2 : 'bal_2',
@@ -223,12 +223,12 @@ def runExpeStochastic(data, params, timeLimit = -1):
     lmbda = data["arcs"]["lmbda"]
     scenarios = data["scenarios"]
 
-    P = math.floor(T + sum(resources[i].fixedCost + resources[i].varCost * T for i in range(num_i))/(num_a*num_i))
+    # P = math.floor(T + sum(resources[i].fixedCost + resources[i].getVarCost(T) for i in range(num_i)))
 
     S_ICEP = gb.Model("s-icep")
     if timeLimit !=-1:
         S_ICEP.setParam("TimeLimit", timeLimit)
-    S_ICEP.Params.LogToConsole = 0  # suppress the log of the model
+    # S_ICEP.Params.LogToConsole = 0  # suppress the log of the model
     S_ICEP.modelSense = gb.GRB.MINIMIZE  # declare mimization
     FL_a_t = S_ICEP.addVars([(s, a, t) for (s, a, t) in lmbda.keys()], vtype=gb.GRB.INTEGER, name="flowLmbda")
     FL_i_k_ab = S_ICEP.addVars([(s, i, k, a, b) for (s, i, k, a, b) in beta.keys() ], vtype=gb.GRB.INTEGER, name="flowBeta")
@@ -238,9 +238,11 @@ def runExpeStochastic(data, params, timeLimit = -1):
     X_i_k_bc = S_ICEP.addVars([(s, i, k, b, c) for (s, i, k, b, c) in gamma.keys()], vtype=gb.GRB.BINARY, name="gammaSelect")
     Y_i_k_cb = S_ICEP.addVars([(s, i, k, c, b) for (s, i, k, c, b) in delta.keys() ], vtype=gb.GRB.BINARY, name="deltaSelect")
     S_i = S_ICEP.addVars([(s, i) for s in range(num_s) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="timeForResourceI")
-    S_mean = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.INTEGER, name="meanTimeForResourceI")
+    S_mean = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.CONTINUOUS, name="meanTimeForResourceI")
     Z_i = S_ICEP.addVars([(i) for i in range(num_i)], vtype=gb.GRB.BINARY, name="isResInFleet")
     N_a = S_ICEP.addVars([(s, a) for s in range(num_s) for a in range(num_a)], vtype=gb.GRB.INTEGER, name="numNotEva")
+    N_a_mean = S_ICEP.addVars([(s) for s in range(num_s) ], vtype=gb.GRB.INTEGER, name="numNotEva_mean")
+
     r = S_ICEP.addVars( [(s) for s in range(num_s)], vtype=gb.GRB.INTEGER, name="totalTime")
     #E_c = S_ICEP.addVar(vtype=gb.GRB.INTEGER, name="meanCost")
    
@@ -248,57 +250,98 @@ def runExpeStochastic(data, params, timeLimit = -1):
     S_ICEP.addConstrs((S_i[s, i]<=r[s] for s in range(num_s) for i in range(num_i)), name="Eq-2")
         
     # Eq. 3
-    S_ICEP.addConstrs(((gb.quicksum( zeta[s, i, h, b].cost *  W_i_1_hb[s, i, h, b]  for h in range(num_h) for b in range(num_b)) 
+    # S_ICEP.addConstrs(((gb.quicksum(zeta[s, i, h, b].cost *  W_i_1_hb[s, i, h, b]  for h in range(num_h) for b in range(num_b)) 
+    #         + 
+    #             gb.quicksum(gamma[s, i, k, b, c].cost * 
+    #              X_i_k_bc[s, i, k, b, c] for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c))
+    #         +
+    #             gb.quicksum(delta[s, i, k, c, b].cost *  
+    #             Y_i_k_cb[s, i, k, c, b] for k in range(scenarios[s].num_k) for c in range(num_c) for b in range(num_b))
+    #         +
+    #             gb.quicksum(resources[i].getAvaiability(s) *  W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) 
+    #         +
+    #             gb.quicksum(resources[i].getLT(s) *  W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) 
+    #         +
+    #             gb.quicksum(resources[i].getLT(s) *  Y_i_k_cb[s, i, k, c, b] for k in range(scenarios[s].num_k) for c in range(num_c) for b in range(num_b))
+    #         +
+    #             gb.quicksum(resources[i].getUT(s) *  X_i_k_bc[s, i, k, b, c] for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c))
+
+    #         == 
+    #             S_i[s, i]) for s in range (num_s) for i in range(num_i)) , name="Eq-3")
+    
+    
+    
+    
+    S_ICEP.addConstrs(((gb.quicksum(zeta[s, i, h, b].cost *  W_i_1_hb[s, i, h, b]  for (s, i, h, b) in zeta.keys() if s == S and i == I) 
             + 
                 gb.quicksum(gamma[s, i, k, b, c].cost * 
-                 X_i_k_bc[s, i, k, b, c] for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c))
+                 X_i_k_bc[s, i, k, b, c] for (s, i, k, b, c) in gamma.keys() if s == S and i == I)
             +
                 gb.quicksum(delta[s, i, k, c, b].cost *  
-                Y_i_k_cb[s, i, k, c, b] for k in range(scenarios[s].num_k) for c in range(num_c) for b in range(num_b))
+                Y_i_k_cb[s, i, k, c, b] for (s, i, k, c, b) in delta.keys() if s == S and i == I)
             +
-                gb.quicksum(resources[i].getAvaiability(s) *  W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) 
+                gb.quicksum(resources[i].getAvaiability(s) *  W_i_1_hb[s, i, h, b] for (s, i, h, b) in zeta.keys() if s == S and i == I) 
             +
-                gb.quicksum(resources[i].getLT(s) *  W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) 
+                gb.quicksum(resources[i].getLT(s) *  W_i_1_hb[s, i, h, b] for (s, i, h, b) in zeta.keys() if s == S and i == I) 
             +
-                gb.quicksum(resources[i].getLT(s) *  Y_i_k_cb[s, i, k, c, b] for k in range(scenarios[s].num_k) for c in range(num_c) for b in range(num_b))
+                gb.quicksum(resources[i].getLT(s) *  Y_i_k_cb[s, i, k, c, b] for (s, i, k, c, b) in delta.keys() if s == S and i == I )
             +
-                gb.quicksum(resources[i].getUT(s) *  X_i_k_bc[s, i, k, b, c] for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c))
+                gb.quicksum(resources[i].getUT(s) *  X_i_k_bc[s, i, k, b, c] for (s, i, k, b, c) in gamma.keys() if s == S and i == I)
 
             == 
-                S_i[s, i]) for s in range (num_s) for i in range(num_i)) , name="Eq-3")
-
+                S_i[S, I]) for S in range (num_s) for I in range(num_i)) , name="Eq-3")
 
 
 
     # Eq. 4
-    S_ICEP.addConstrs((FL_a_t[s, a, t] <= lmbda[s, a, t].flow  for (s, a, t) in lmbda.keys())) #for a in range(num_a) if(a, 0) in lmbda ) ,name="Eq-4" )
+    S_ICEP.addConstrs((FL_a_t[s, a, t] <= lmbda[s, a, t].flow  for (s, a, t) in lmbda.keys())) 
     
     # Eq. 5
-    S_ICEP.addConstrs((FL_i_k_bc[s, i, k, b, c] <= resources[i].capacity * X_i_k_bc[s, i, k, b, c] for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c) ), name="Eq-5")
+    S_ICEP.addConstrs((FL_i_k_bc[s, i, k, b, c] <= resources[i].capacity * X_i_k_bc[s, i, k, b, c] for (s, i, k, b, c) in gamma.keys() ), name="Eq-5")
 
     # Eq. 7
-    S_ICEP.addConstrs((gb.quicksum( FL_i_k_ab[s, i, k, a, b] for a in range(num_a)  ) 
-        ==
-            gb.quicksum( FL_i_k_bc[s, i, k, b, c] for c in range(num_c) ) 
+    # S_ICEP.addConstrs((gb.quicksum( FL_i_k_ab[s, i, k, a, b] for a in range(num_a)  ) 
+    #     ==
+    #         gb.quicksum( FL_i_k_bc[s, i, k, b, c] for c in range(num_c) ) 
             
-            for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for b in range(num_b))     
+    #         for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for b in range(num_b))     
+    #     , name="Eq-7")
+
+    S_ICEP.addConstrs(((gb.quicksum( FL_i_k_ab[s, i, k, a, b] for (s, i, k, a, b) in beta.keys() if s == S and i == I and k == K and b == B ) 
+        ==
+            gb.quicksum( FL_i_k_bc[s, i, k, b, c ] for (s, i, k, b, c ) in gamma.keys() if s == S and i == I and k == K and b == B ))
+            
+            for S in range(num_s) for I in range(num_i) for K in range(scenarios[S].num_k) for B in range(num_b) )     
         , name="Eq-7")
     
     # Eq. 8
-    S_ICEP.addConstrs(((gb.quicksum(FL_i_k_bc[s, i, k, b, c]  for b in range(num_b) )
-        ==
-            FL_i_k_ct[s, i, k, c, t] )
+    # S_ICEP.addConstrs(((gb.quicksum(FL_i_k_bc[s, i, k, b, c]  for b in range(num_b) )
+    #     ==
+    #         FL_i_k_ct[s, i, k, c, t] )
             
-            for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(1)), name="Eq-8")
+    #         for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for c in range(num_c) for t in range(1)), name="Eq-8")
+    
+    S_ICEP.addConstrs(((gb.quicksum(FL_i_k_bc[s, i, k, b, c]  for (s, i, k, b, c) in gamma.keys() if s == S and i == I and k == K and c == C )
+        ==
+            FL_i_k_ct[S, I, K, C, T] for (S, I, K, C, T) in epsilon.keys()  )
+            
+           
+            ), name="Eq-8")
  
     # Eq. 12
-    S_ICEP.addConstrs((((gb.quicksum(W_i_1_hb[s, i, h, b]  for h in range(num_h)) == gb.quicksum(X_i_k_bc[s, i, k, b, c]  for c in range(num_c))) for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) if k == 0 for b in range(num_b) )), name="Eq-12")
+    # S_ICEP.addConstrs((((gb.quicksum(W_i_1_hb[s, i, h, b]  for h in range(num_h)) == gb.quicksum(X_i_k_bc[s, i, k, b, c]  for c in range(num_c))) for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) if k == 0 for b in range(num_b) )), name="Eq-12")
+    S_ICEP.addConstrs((((gb.quicksum(W_i_1_hb[s, i, h, b]  for (s, i, h, b) in zeta.keys() if s ==S and i == I and b == B)
+        == 
+        gb.quicksum(X_i_k_bc[s, i, k, b, c]  for (s, i, k, b, c) in gamma.keys() if s == S and i == I and k == K and b == B)) 
+        for S in range(num_s) for I in range(num_i) for K in range(scenarios[S].num_k) if K == 0 for B in range(num_b) )), name="Eq-12")
 
     # Eq. 13
-    S_ICEP.addConstrs(((gb.quicksum(Y_i_k_cb[s, i, k - 1, c, b] for c in range(num_c)) == gb.quicksum(X_i_k_bc[s, i, k, b, c] for c in range(num_c) )) for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k)  for b in range(num_b) if k!=0 ), name="Eq-13")
+    # S_ICEP.addConstrs(((gb.quicksum(Y_i_k_cb[s, i, k - 1, c, b] for c in range(num_c)) == gb.quicksum(X_i_k_bc[s, i, k, b, c] for c in range(num_c) )) for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k)  for b in range(num_b) if k!=0 ), name="Eq-13")
+    S_ICEP.addConstrs(((gb.quicksum(Y_i_k_cb[s, i, k - 1, c, b] for (s, i, k, c, b) in delta.keys() if s == S and i == I and k == K and b == B) == gb.quicksum(X_i_k_bc[s, i, k, b, c] for (s, i, k, b, c) in delta.keys() if s == S and i == I and k == K and b == B )) for S in range(num_s) for I in range(num_i) for K in range(scenarios[S].num_k)  for B in range(num_b) if K!=0 ), name="Eq-13")
 
     # Eq. 14
-    S_ICEP.addConstrs(((gb.quicksum(X_i_k_bc[s, i, k, b, c] for b in range(num_b)) >= gb.quicksum(Y_i_k_cb[s, i, k, c, b] for b in range(num_b))) for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for c in range(num_c) if k!=scenarios[s].num_k-1 ), name="Eq-14" ) # Altra condizione
+    # S_ICEP.addConstrs(((gb.quicksum(X_i_k_bc[s, i, k, b, c] for b in range(num_b)) >= gb.quicksum(Y_i_k_cb[s, i, k, c, b] for b in range(num_b))) for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for c in range(num_c) if k!=scenarios[s].num_k-1 ), name="Eq-14" ) # Altra condizione
+    S_ICEP.addConstrs(((gb.quicksum(X_i_k_bc[s, i, k, b, c] for (s, i, k, b, c) in gamma.keys() if s == S and i == I and k == K and c == C) >= gb.quicksum(Y_i_k_cb[s, i, k, c, b] for (s, i, k, c, b) in delta.keys() if s == S and i == I and k == K and c == C)) for S in range(num_s) for I in range(num_i) for K in range(scenarios[S].num_k) for C in range(num_c) if K!=scenarios[S].num_k-1 ), name="Eq-14" ) # Altra condizione
 
     # Eq. 15
     S_ICEP.addConstrs((FL_a_t[s, a, t] >= 0 for s in range(num_s) for a in range(num_a) for t in range(num_t)), name="Eq-15")
@@ -323,33 +366,43 @@ def runExpeStochastic(data, params, timeLimit = -1):
     S_ICEP.addConstrs(X_i_k_bc[s, i, k, b, c] <= gamma[s, i, k, b, c].isLegit for (s, i, k, b, c) in gamma)
     S_ICEP.addConstrs(Y_i_k_cb[s, i, k, c, b] <= delta[s, i, k, c, b].isLegit for (s, i, k, c, b) in delta)
     #                ensures that a resource departs from its assigned initia location
-    S_ICEP.addConstrs(W_i_1_hb[s, i, h, b] <= zeta[s, i, h, b].isInitialLocValid() for (s, i, h, b) in zeta)
+    #S_ICEP.addConstrs(W_i_1_hb[s, i, h, b] <= zeta[s, i, h, b].isInitialLocValid() for (s, i, h, b) in zeta)
 
     # Eq. 30
-    S_ICEP.addConstrs((FL_i_k_bc[s, i, k, b, c] <= resources[i].capacity*Z_i[i] for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c)), name="Eq-30")
+    S_ICEP.addConstrs((FL_i_k_bc[s, i, k, b, c] <= resources[i].capacity*Z_i[i] for (s, i, k, b, c) in gamma.keys() ), name="Eq-30")
     
     # Eq. 31
-    S_ICEP.addConstrs(((scenarios[s].evaAreas[a].evaDemand == FL_a_t[s, a, 0] + gb.quicksum(FL_i_k_ab[s, i, k, a, b] for i in range(num_i) for k in range(scenarios[s].num_k)  for b in range(num_b)) + N_a[s, a])  for s in range(num_s) for a in range(num_a)), name="Eq-31" )
+    S_ICEP.addConstrs(((scenarios[S].evaAreas[A].evaDemand == FL_a_t[S, A, 0] + gb.quicksum(FL_i_k_ab[s, i, k, a, b] for (s, i, k, a, b) in beta.keys() if s == S and a == A ) + N_a[S, A])  for S in range(num_s) for A in range(num_a)), name="Eq-31" )
 
     # Eq. 32
-    S_ICEP.addConstrs((gb.quicksum( W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) <= Z_i[i] for s in range(num_s) for i in range(num_i)), name="Eq-32")
+    # S_ICEP.addConstrs((gb.quicksum( W_i_1_hb[s, i, h, b] for h in range(num_h) for b in range(num_b)) <= Z_i[i] for s in range(num_s) for i in range(num_i)), name="Eq-32")
+    S_ICEP.addConstrs((gb.quicksum( W_i_1_hb[s, i, h, b] for (s, i, h, b) in zeta.keys() if s == S and i == I) <= Z_i[I] for S in range(num_s) for I in range(num_i)), name="Eq-32")
 
     # Eq. 33
-    S_ICEP.addConstrs((gb.quicksum( X_i_k_bc[s, i, k, b, c] for b in range(num_b) for c in range(num_c)) <= Z_i[i] for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k)), name="Eq-33")
+    # S_ICEP.addConstrs((gb.quicksum( X_i_k_bc[s, i, k, b, c] for b in range(num_b) for c in range(num_c)) <= Z_i[i] for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k)), name="Eq-33")
+    S_ICEP.addConstrs((gb.quicksum( X_i_k_bc[s, i, k, b, c] for (s, i, k, b, c) in gamma.keys() if s == S and i == I and k == K) <= Z_i[I] for S in range(num_s) for I in range(num_i) for K in range(scenarios[S].num_k)), name="Eq-33")
 
     # Eq. 34
-    S_ICEP.addConstrs((gb.quicksum(Y_i_k_cb[s, i, k, c, b] for c in range(num_c) for b in range(num_b)) <= Z_i[i] for s in range(num_s) for i in range(num_i) for k in range(scenarios[s].num_k) if k!=scenarios[s].num_k-1 ), name="Eq-34")
+    S_ICEP.addConstrs((gb.quicksum(Y_i_k_cb[s, i, k, c, b] for (s, i, k, c, b) in delta.keys() if s == S and i == I and k == K ) <= Z_i[I] for S in range(num_s) for I in range(num_i) for K in range(scenarios[S].num_k) if K!=scenarios[S].num_k-1 ), name="Eq-34")
+
+
+
+
+
+
 
     # Eq. 35
+
     S_ICEP.addConstrs(((N_a[s, a] >= 0 )for s in range(num_s) for a in range(num_a)), name="Eq-35")
 
-    S_ICEP.addConstrs((S_mean[i] == gb.quicksum( S_i[s, i] for s in range(num_s) )for i in range(num_i) ), name='meanTime- Eq.')
+    S_ICEP.addConstrs((S_mean[i] == gb.quicksum( scenarios[s].probability * S_i[s, i] for s in range(num_s) )for i in range(num_i) ), name='meanTime- Eq.')
+    S_ICEP.addConstrs((N_a_mean[s] == gb.quicksum(N_a[s, a] for a in range(num_a))) for s in range(num_s) )
+    # S_ICEP.addConstr(gb.quicksum(Z_i[i] for i in range(num_i)) >= 1)
 
-    fraction = []
-    
-    for s in range(num_s):
-        fraction.append( (gb.quicksum(resources[i].getVarCost(S_i[s, i]) for i in range(num_i))) / (sum(resources[i].fixedCost + resources[i].getVarCost(T) for i in range(num_i))) )
-    
+    # S_ICEP.addConstrs(gb.quicksum(W_i_1_hb[s, i, h, b] for s in range(num_s) for h in range(num_h) for b in range(num_b)) >= Z_i[i] for i in range(num_i) )
+    # S_ICEP.addConstrs(gb.quicksum(X_i_k_bc[s, i, k, b, c] for s in range(num_s) for k in range(scenarios[s].num_k) for b in range(num_b) for c in range(num_c)) >= Z_i[i] for i in range(num_i) )
+    # S_ICEP.addConstrs(gb.quicksum(Y_i_k_cb[s, i, k, c, b] for s in range(num_s) for k in range(scenarios[s].num_k) for c in range(num_c) for b in range(num_b)) >= Z_i[i] for i in range(num_i) )
+
     # Problem extensions
 
     # Eq. for forcing m percent of population to be saved
@@ -359,10 +412,15 @@ def runExpeStochastic(data, params, timeLimit = -1):
     # Set up objective functions
     o = 0
     firstObj = dict()
+    fraction = []
+    
+    for s in range(num_s):
+        # fraction.append( (gb.quicksum(resources[i].getVarCost(S_i[s, i]) for i in range(num_i))) / (sum(resources[i].fixedCost + resources[i].getVarCost(T) for i in range(num_i))) )
+        fraction.append((gb.quicksum(resources[i].getVarCost(S_i[s, i]) for i in range(num_i) ) / sum(resources[i].fixedCost + resources[i].getVarCost(T) for i in range(num_i)) )) 
+    
 
 
-    bal = (((gb.quicksum(resources[i].fixedCost * Z_i[i] for i in range(num_i)))/(sum(resources[i].fixedCost + 
-         resources[i].getVarCost(T) for i in range(num_i))))) # + ((gb.quicksum(scenarios[s].probability * 
+    bal = gb.quicksum(resources[i].fixedCost * Z_i[i] for i in range(num_i))/sum(resources[i].fixedCost + resources[i].getVarCost(T) for i in range(num_i)) # + ((gb.quicksum(scenarios[s].probability * 
         # (r[s] + fraction[s]) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))) for s in range(num_s))))
 
     #S_ICEP.setObjectiveN(bal, 0, 1)
@@ -383,21 +441,22 @@ def runExpeStochastic(data, params, timeLimit = -1):
         obj = dict()
         
         bal_1 = (r[s] + fraction[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
-        bal_2 = scenarios[s].probability*(gb.quicksum(S_i[s,i] for i in range(num_i)) + fraction[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
+        # bal_1 = (r[s] + gb.quicksum(resources[i].varCost * S_i[s, i] for i in range(num_i)) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
+        bal_2 = (gb.quicksum(S_i[s,i] for i in range(num_i)) + fraction[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
         
 
-        cons_1 = scenarios[s].probability* (r[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
-        cons_2 = scenarios[s].probability* (gb.quicksum(S_i[s,i] for i in range(num_i)) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
+        cons_1 = (r[s] + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
+        cons_2 = (gb.quicksum(S_i[s,i] for i in range(num_i)) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
 
-        econ_1 = scenarios[s].probability * (gb.quicksum(resources[i].getVarCost(S_i[s, i]) for i in range(num_i)) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
-        econ_2 = scenarios[s].probability * (gb.quicksum(resources[i].getVarCost(S_i[s, i]) for i in range(num_i)) + r[s]/T + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
+        econ_1 = (gb.quicksum(resources[i].getVarCost(S_i[s, i]) for i in range(num_i)) + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
+        # econ_2 = (gb.quicksum(resources[i].getVarCost(S_i[s, i]) for i in range(num_i)) + r[s]/T + (P*(gb.quicksum(N_a[s, a] for a in range(num_a) ))))
         
         obj['bal_1'] = bal_1
         obj['bal_2'] = bal_2
         obj['cons_1'] = cons_1
         obj['cons_2'] = cons_2
         obj['econ_1'] = econ_1
-        obj['econ_2'] = econ_2
+        # obj['econ_2'] = econ_2
 
         obj2 = obj[objFunction]
         secondObj.append(obj2) 
@@ -409,7 +468,7 @@ def runExpeStochastic(data, params, timeLimit = -1):
 
 
     # S_ICEP.setObjectiveN(firstObj[objFunction] + gb.quicksum(scenarios[s].probability*secondObj[s] for s in range(num_s)), 0, 1)
-    #S_ICEP.tune()
+    # S_ICEP.tune()
     S_ICEP.write("model/mymodel.lp")
     S_ICEP.optimize()
 
@@ -424,4 +483,5 @@ def runExpeStochastic(data, params, timeLimit = -1):
 
 
 if __name__ == "__main__":
-    throwSequence()
+    # throwSequence()
+    throw()

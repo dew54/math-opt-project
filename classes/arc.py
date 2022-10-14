@@ -66,11 +66,11 @@ class Arc:
             return 1
     def isInitialLocValid(self):
         if self.resource.initialLocation == self.startNode:
-            res =  1
+            result =  1
         else:
-            res =  0
+            result =  0
     
-        return res
+        return result
 
 
     
