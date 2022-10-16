@@ -23,12 +23,20 @@ class Resource:
         self.fixedCost = self.index * 10000
         self.varCost = self.index * 1.5# cost per unit time
         self.unloadingTime = random.randint(4, 15)
-        self.emptySpeed = 3 #(21- self.index)/3                                #Km/min
+        self.emptySpeed = 1 #(21- self.index)/3                                #Km/min
         self.loadedSpeed = self.emptySpeed * 0.77                           #Km/min
         self.maxTrips = 0 
         h = len(initialLocations)
         index = random.randint(0, h-1 )
         self.initialLocation = initialLocations[index]
+    
+    # def setInitLoc(self, initialLocations, num_i):
+    #     h = len(initialLocations)
+    #     for h in initialLocations:
+    #         index = h % num_i 
+
+        
+        
         #self.setTimes(timeCoeff)
 
     def setSpeed(self, coeff):

@@ -44,7 +44,7 @@ class Plotting():
 
         for loc in self.initialLocations:
             position = loc.position
-            self.plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="yellow", markerfacecolor="grey")
+            self.plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="green")
 
 
         for pickUpPoint in self.pickUpPoints:
@@ -176,7 +176,7 @@ class Plotting():
     def show(self):
         self.plt.show()
 
-    def plotGammaArc(self, vars, i, k, s = -1):
+    def plotGammaArc(self, vars, i , k , s = -1):
         #self.plotBase()
         for l in range(len(vars)):
             if vars[l].X == 1:
@@ -214,7 +214,6 @@ class Plotting():
                         I, h, b = Utils.getKeys(vars[l].VarName)
                         if I == i:
                             z = self.zeta[i, h, b]
-                            print(i, h, b)
                             pStart = z.startNode.position
                             pEnd = z.endNode.position
                             x, y = pStart[0], pStart[1] 

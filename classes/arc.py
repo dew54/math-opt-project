@@ -10,20 +10,18 @@ class Arc:
         self.type = typ                       # If arc is type: alfa, beta, gamma, delta
         self.length = self.getLength()
         self.isLegit = 0
+        self.isInitLocValid = 0
         self.flow = int()
         
         if(typ == "gamma"):
-            try:
-                self.resource = resource
-                self.cost = math.ceil((self.length/resource.loadedSpeed)*speedCoeff)
-                
-                self.flow = resource.capacity/self.cost
-                
-                self.trip = resource.trip #SERVE???
-                self.isLegit = self.legit()
-            except:
-                print('coeff is: ',speedCoeff)
-                print('length is: ', self.length)
+        
+            self.resource = resource
+            self.cost = math.ceil((self.length/resource.loadedSpeed)*speedCoeff)
+            
+            self.flow = resource.capacity/self.cost
+            
+            self.trip = resource.trip #SERVE???
+            self.isLegit = self.legit()
 
         elif(typ == "delta"):
             self.resource = resource
@@ -31,12 +29,14 @@ class Arc:
             self.flow = resource.capacity/self.cost
             self.trip = resource.trip #SERVE???
             self.isLegit = self.legit()
+
         elif(typ == "zeta"):
             self.resource = resource
             self.cost = math.ceil((self.length/resource.emptySpeed)*speedCoeff)
             self.flow = 0
             self.trip = 0
             self.isLegit = self.legit()
+            self.isInitLocValid = self.isInitialLocValid()
         elif(typ == "alfa"):
             self.cost = 0
             
@@ -60,10 +60,15 @@ class Arc:
         return Utils().distance(p1, p2)
     
     def legit(self):
-        if self.resource.clas != self.startNode.clas or self.resource.clas != self.endNode.clas:
-            return 0
+
+        if self.resource.clas == self.endNode.clas:
+            result =  1
         else:
-            return 1
+            result =  0
+        # print('is valid ', self.type ,' ',result)
+        return result
+
+            
     def isInitialLocValid(self):
         if self.resource.initialLocation == self.startNode:
             result =  1
