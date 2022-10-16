@@ -1,4 +1,4 @@
-# math-opt-project
+# ISOLATED COMMUNITY EVACUATION PROBLEM
 Progetto esame mathematical optimisation
 
 This is python implementation of the Isolated Community Evacuation Problem (ICEP, see paper.pdf).
