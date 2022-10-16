@@ -1,7 +1,7 @@
 
 from matplotlib import pyplot as plt
 from matplotlib import collections  as mc
-from utils import Utils
+from classes.utils import Utils
 
 
 class Plotting():
@@ -44,7 +44,7 @@ class Plotting():
 
         for loc in self.initialLocations:
             position = loc.position
-            self.plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="yellow", markerfacecolor="grey")
+            self.plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="green", markerfacecolor="green")
 
 
         for pickUpPoint in self.pickUpPoints:
@@ -102,6 +102,54 @@ class Plotting():
         #         xm, ym = Utils.middle(pStart, pEnd)
         #         self.plt.text(xm -1 , ym, str(int(g.cost)))
 
+
+    def plotClass(self):
+        #Plotting=========================================================0
+
+        colors = {
+            0 : 'yellow',
+            1 : 'red',
+            2 : 'blue',
+            3 : 'green'
+        }
+
+        #plot source 
+        sourcePosition = self.data["nodes"]["source"].position
+        
+
+        self.plt.plot(sourcePosition[0], sourcePosition[1], marker="+", markersize=10, markeredgecolor="red", markerfacecolor="green")
+        # plot evaAreas
+
+        
+        for area in self.evaAreas:
+            position = area.position
+            color = colors[area.clas]
+            self.plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor=color, markerfacecolor=color)
+
+
+        for loc in self.initialLocations:
+            position = loc.position
+            self.plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor="yellow", markerfacecolor="grey")
+
+
+        for pickUpPoint in self.pickUpPoints:
+            position = pickUpPoint.position
+            #print(position)
+            color = colors[pickUpPoint.clas]
+            self.plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor=color, markerfacecolor=color)
+
+
+        for shelter in self.shelters:
+            position = shelter.position
+            #print(position)
+            color = colors[shelter.clas]
+            self.plt.plot(position[0], position[1], marker="o", markersize=10, markeredgecolor=color, markerfacecolor=color)
+
+
+        position = self.sink.position
+        self.plt.plot(position[0], position[1], marker="+", markersize=10, markeredgecolor="green", markerfacecolor="red")
+
+
     def plotResourceArcs(self):
 
         for g in self.gamma:
@@ -128,7 +176,7 @@ class Plotting():
     def show(self):
         self.plt.show()
 
-    def plotGammaArc(self, vars, i, k, s = -1):
+    def plotGammaArc(self, vars, i , k , s = -1):
         #self.plotBase()
         for l in range(len(vars)):
             if vars[l].X == 1:
@@ -166,7 +214,6 @@ class Plotting():
                         I, h, b = Utils.getKeys(vars[l].VarName)
                         if I == i:
                             z = self.zeta[i, h, b]
-                            print(i, h, b)
                             pStart = z.startNode.position
                             pEnd = z.endNode.position
                             x, y = pStart[0], pStart[1] 

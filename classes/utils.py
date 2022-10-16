@@ -10,6 +10,8 @@ class Utils:
         x2 = p2[0]
         y2 = p2[1]
         d = int(math.sqrt((x1-x2)**2 + (y1-y2)**2))
+        if d == 0:
+            d = 1
         d = d/10               # Conversion: we assume eva area is 10 x 10 Km wide
         
         return d
@@ -45,8 +47,28 @@ class Utils:
         b = scenario.weather["rain"][key][scenario.rainLevel]
         c = scenario.weather["light"][key][scenario.lightLevel]
         coeff = (a + b + c)/3
-        print(coeff)
         return coeff
+
+    def getVars(self, variables, name):
+        vars = dict()
+        values = []
+        keys = []
+        
+        for l in range(len(variables)):
+            if name in str(variables[l].VarName):   
+                
+                keys.append(self.getKeys(variables[l].VarName))
+                values.append(variables[l].X) 
+        
+        
+        return values, keys
+
+# def computeAverage(self, variables, name):
+#     values, keys = self.getVars(self, variables, name)
+#     for i in range(len(keys)):
+#         for k in keys[i]:
+
+
 
 
 
