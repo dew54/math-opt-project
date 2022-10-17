@@ -193,9 +193,9 @@ def throwMany():
     numClas = 1            # Number of classes of rescue resources
 
     parameters = { #          s, i, a, b, c, h
-        # 1 : [1, 1, 1, 1, 1],
-        # 2 : [2, 2, 2, 2, 2],
-        # 2 : [2, 3, 3, 3, 2],
+        1 : [1, 1, 1, 1, 1],
+        2 : [2, 2, 2, 2, 2],
+        2 : [2, 3, 3, 3, 2],
         3 : [4, 3, 3, 2, 2],
         4 : [4, 3, 4, 3, 3],
         5 : [5, 3, 5, 3, 3],
@@ -203,11 +203,11 @@ def throwMany():
         7 : [6, 4, 7, 4, 4],
         8 : [6, 5, 8, 5, 4],
         10: [7, 5, 8, 5, 4],
-        # 11 : [7, 6, 8, 6, 6],
-        # 12 : [8, 6, 7, 6, 6],
-        # 13 : [9, 7, 7, 6, 6],
-        # 14 : [9, 8, 8, 8, 6],
-        # 15 : [9, 8, 10, 8, 8],
+        11 : [7, 6, 8, 6, 6],
+        12 : [8, 6, 7, 6, 6],
+        13 : [9, 7, 7, 6, 6],
+        14 : [9, 8, 8, 8, 6],
+        15 : [9, 8, 10, 8, 8],
         # 16 : [9, 8, 11, 8, 8],
         # 17 : [9, 9, 11, 8, 8],
         # 18 : [9, 9, 11, 8, 8],
@@ -287,8 +287,12 @@ def throwMany():
         numScen = []
         numK = []
         
-        for evaDemand in range(50, 500, 50):
-            
+        for row in parameters.values():
+            num_a = row[1]
+            num_b = row[2]
+            num_c = row[3]
+            num_h = row[4]            
+            numNodes = num_a + num_b + num_c + num_h
             data = generateSimpleData(num_i, num_a, num_h, num_b, num_c, num_selfEva, evaDemand, numClas)
             status, runtime, objVal, experiment = runExpe(data, 1000)
             if status == 2:
